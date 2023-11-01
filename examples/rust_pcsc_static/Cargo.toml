@@ -1,0 +1,11 @@
+[package]
+name = "pcsc_demo"
+version = "0.1.0"
+authors = ["Some Person <demo@person.com>"]
+
+[dependencies]
+pcsc = { git = "https://github.com/bluetech/pcsc-rust", rev = "9d7c1645a7fd9639d0585f3a4cc698b54d9746e5" }
+
+[[bin]]
+name = "pcsc_demo"
+path = "main.rs"
