@@ -14,5 +14,5 @@ ENV PCSC_LIB_NAME='static=pcsclite'
 ENV RUSTFLAGS='-L lib -C target-feature=+crt-static'
 RUN cargo build --target x86_64-unknown-linux-musl --release
 
-FROM static
+FROM scratch
 COPY --from=build target/release/pcsc_demo .
