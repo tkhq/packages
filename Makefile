@@ -1,14 +1,29 @@
-out/gcc.oci.tgz:
-	docker build -f packages/gcc/Dockerfile -t ocirep/gcc .
+export SOURCE_DATE_EPOCH = 0
 
-out/glibc.oci.tgz:
-	docker build -f packages/glibc/Dockerfile -t ocirep/glibc .
+out/bootstrap.oci.tgz:
+	docker build -t ocirep/bootstrap --output type=oci,dest=$@ packages/bootstrap
 
-out/bash.oci.tgz:
-	docker build -f packages/bash/Dockerfile -t ocirep/bash .
+out/gcc.oci.tgz: \
+	out/bootstrap.oci.tgz
+	docker build -t ocirep/gcc --output type=oci,dest=$@ packages/gcc
 
-out/busybox.oci.tgz:
-	docker build -f packages/busybox/Dockerfile -t ocirep/busybox .
+out/glibc.oci.tgz: \
+	out/gcc.oci.tgz
+	docker build -t ocirep/glibc --output type=oci,dest=$@ packages/glibc
 
-out/go.oci.tgz:
-	docker build -f packages/go/Dockerfile -t ocirep/go .
+out/bash.oci.tgz: \
+	out/gcc.oci.tgz \
+	out/glibc.oci.tgz
+	docker build -t ocirep/bash --output type=oci,dest=$@ packages/bash
+
+out/busybox.oci.tgz: \
+	out/gcc.oci.tgz \
+	out/glibc.oci.tgz
+	docker build -t ocirep/busybox --output type=oci,dest=$@ packages/busybox
+
+out/go.oci.tgz: \
+	out/gcc.oci.tgz \
+	out/glibc.oci.tgz \
+	out/busybox.oci.tgz \
+	out/bash.oci.tgz
+	docker build -t ocirep/go --output type=oci,dest=$@ packages/go
