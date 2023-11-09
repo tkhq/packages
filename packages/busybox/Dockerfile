@@ -48,16 +48,17 @@ RUN set -eux; \
 	done
 
 RUN make
-RUN cp ./busybox /
+RUN cp busybox /
 
 FROM scratch
-COPY --from=build /busybox .
+COPY --from=build busybox /
 RUN ["/busybox","mkdir","/bin"]
 RUN ["/busybox","--install","-s","/bin"]
-RUN echo "nogroup:*:100:nobody" > /etc/group
-RUN echo "nobody:*:100:100:::" > /etc/passwd
-RUN mkdir /tmp
-RUN chown -R 100:100 /tmp
-WORKDIR /tmp
-USER 100:100
+RUN echo "user:x:1000:" > /etc/group
+RUN echo "user:x:1000:1000::/home/user:/bin/sh" > /etc/passwd
+RUN mkdir -p /home/user /tmp /lib
+RUN ln -sT /lib /lib64
+RUN chown -R 1000:1000 /home/user /tmp
+WORKDIR /home/user
+USER 1000:1000
 ENTRYPOINT ["/bin/sh"]
