@@ -1,64 +1,77 @@
-ARG GO_VERSION=1.21.3
-ARG GO_HASH=186f2b6f8c8b704e696821b09ab2041a5c1ee13dcbc3156a13adcf75931ee488
-ARG GO_STAGE2_VERSION=1.19.11
-ARG GO_STAGE2_HASH=f4ff5b5eb3a3cae1c993723f3eab519c5bae18866b5e5f96fe1102f0cb5c3e52
-ARG GO_SOURCE_SITE = https://dl.google.com/go
-ARG GO_BOOTSTRAP_SOURCE = go${GO_BOOTSTRAP_VERSION}
-ARG BUSYBOX_IMAGE=ocirep:busybox
-ARG GCC_IMAGE=ocirep:gcc
+ARG GCC_IMAGE=library/gcc@sha256:ca38f292fe1ad0933f0122a657f9c644ed1f0a9e1aa336abcc83d420ad487e28
+#FROM ocirep/busybox:latest as busybox
+FROM library/busybox:latest as busybox
+FROM ocirep/bash:latest as bash
 
-# build go bootstrap stage 1 with gcc
-FROM ${BUSYBOX_IMAGE} as stage1
+FROM ${GCC_IMAGE} as stage1
+ENV GO_SITE=https://dl.google.com/go
+ENV GO_VERSION=1.4-bootstrap-20171003
+ENV GO_HASH=f4ff5b5eb3a3cae1c993723f3eab519c5bae18866b5e5f96fe1102f0cb5c3e52
 ENV GOOS=linux
-ENV GOROOT_FINAL="lib/go-${GO_STAGE1_VERSION}"
+ENV GOROOT_FINAL="/opt/go-stage1"
 ENV GOROOT="${GOROOT_FINAL}"
 ENV GOBIN="${GOROOT_FINAL}/bin"
 ENV CGO_ENABLED=0
-COPY --from=${GCC_IMAGE} / /
-RUN wget ${GO_SOURCE_SITE}/${GO_STAGE1_VERSION}.tar.gz
-RUN echo "${GO_STAGE1_HASH} ${GO_STAGE1_VERSION}.tar.gz" | sha256sum -c
-RUN tar -xvzf ${GO_STAGE1_VERSION}.tar.gz
-RUN env -C go ./make.bash
-RUN \
-    mkdir -p lib/go-${GO_STAGE1_VERSION} \
-    && cp bin lib pkg src lib/go-${GO_STAGE1_VERSION}
+RUN wget ${GO_SITE}/go${GO_VERSION}.tar.gz
+RUN echo "${GO_HASH} go${GO_VERSION}.tar.gz" | sha256sum -c
+RUN tar -xzf go${GO_VERSION}.tar.gz
+RUN cd go/src \
+    && ./make.bash
+RUN cd go \
+    && mkdir -p ${GOROOT_FINAL} \
+    && cp -R bin lib pkg src ${GOROOT_FINAL}
 
-# build go bootstrap stage 2 with go bootstrap stage 1
-FROM ${BUSYBOX_IMAGE} as stage2
+FROM busybox as stage2
+COPY --from=stage1 /opt/go-stage1 /opt/go-stage1
+COPY --from=bash bash /bin/bash
+ENV GO_VERSION=1.19.11
+ENV GO_HASH=e25c9ab72d811142b7f41ff6da5165fec2d1be5feec3ef2c66bc0bdecb431489
+ENV GOROOT_BOOTSTRAP=/opt/go-stage1
+ENV GO_SITE=https://storage.googleapis.com/golang
 ENV GOOS=linux
-ENV GOROOT_FINAL="lib/go-${GO_STAGE2_VERSION}"
+ENV GOROOT_FINAL=/opt/go-stage2
 ENV GOROOT="${GOROOT_FINAL}"
 ENV GOBIN="${GOROOT_FINAL}/bin"
 ENV GO11MODULE=off
 ENV CGO_ENABLED=0
-RUN wget ${GO_SOURCE_SITE}/${GO_STAGE2_VERSION}.tar.gz
-RUN echo "${GO_STAGE2_HASH} ${GO_STAGE2_VERSION}.tar.gz" | sha256sum -c
-COPY --from=stage1 lib /
-RUN tar -xvzf ${GO_STAGE2_VERSION}.tar.gz
-RUN env -C go ./make.bash
-RUN \
-    mkdir -p lib/go-${GO_STAGE1_VERSION} \
-    && cp bin lib pkg src lib/go-${GO_STAGE1_VERSION}
+RUN wget ${GO_SITE}/go${GO_VERSION}.src.tar.gz
+RUN echo "${GO_HASH} go${GO_VERSION}.src.tar.gz" | sha256sum -c
+RUN tar -xvzf go${GO_VERSION}.src.tar.gz
+RUN cd go/src \
+    && /bin/bash make.bash
 
-# build target go with go bootstrap stage 2
-FROM ${BUSYBOX_IMAGE} as stage3
+RUN cd go \
+    && mkdir -p ${GOROOT_FINAL} \
+    && cp -R bin lib pkg src ${GOROOT_FINAL}
+
+
+FROM busybox as stage3
+COPY --from=stage2 /opt/go-stage2 /opt/go-stage2
+COPY --from=bash bash /bin/bash
+ENV GO_VERSION=1.21.4
+ENV GO_HASH=47b26a83d2b65a3c1c1bcace273b69bee49a7a7b5168a7604ded3d26a37bd787
+ENV GOROOT_BOOTSTRAP=/opt/go-stage2
+ENV GO_SITE=https://storage.googleapis.com/golang
 ENV GOOS=linux
 ENV GOPROXY=off
 ENV GOTOOLCHAIN=local
 ENV GOFLAGS=-mod=vendor
-ENV GOROOT_FINAL="lib/go"
-ENV GOROOT="${GOROOT_FINAL}"
+ENV GOROOT_FINAL="/opt/go"
+ENV GOROOT=/opt/go-stage2
 ENV GOBIN="${GOROOT_FINAL}/bin"
 ENV GO11MODULE=on
 ENV CGO_ENABLED=0
-RUN wget ${GO_SOURCE_SITE}/${GO_VERSION}.tar.gz
-RUN echo "${GO_HASH} ${GO_VERSION}.tar.gz" | sha256sum -c
-COPY --from=stage2 lib /
-RUN tar -xvzf ${GO_VERSION}.tar.gz
-RUN env -C go ./make.bash
-RUN \
-    mkdir -p lib/go \
-    && cp bin lib pkg src lib/go
+RUN wget ${GO_SITE}/go${GO_VERSION}.src.tar.gz
+RUN echo "${GO_HASH} go${GO_VERSION}.src.tar.gz" | sha256sum -c
+RUN tar -xvzf go${GO_VERSION}.src.tar.gz
+RUN cd go/src \
+    && ./make.bash
+RUN cd go \
+    && mkdir -p ${GOROOT_FINAL} \
+    && cp -R bin lib pkg src ${GOROOT_FINAL}
 
 FROM scratch
-COPY --from=stage3 lib /
+COPY --from=stage3 /opt/go /
+USER 100:100
+ENTRYPOINT ["/bin/go"]
+CMD ["version"]
