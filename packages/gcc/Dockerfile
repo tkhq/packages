@@ -1,3 +1,4 @@
+FROM ocirep/musl:latest as musl
 FROM ocirep/bootstrap:latest as build
 
 ENV GCC_SITE https://mirrors.kernel.org/gnu/gcc
@@ -11,15 +12,19 @@ WORKDIR gcc-${GCC_VERSION}
 RUN set -ex; \
 	./contrib/download_prerequisites; \
 	{ rm *.tar.* || true; }
+
 RUN set -ex; \
 	./configure \
-		--build="x86_64-linux-gnu" \
+		--build="x86_64-linux-musl" \
+		--host="x86_64-linux-musl" \
 		--disable-multilib \
 		--enable-languages=c,c++ \
         --prefix /rootfs \
 	; \
 	make -j "$(nproc)"; \
 	make install-strip
+COPY --from=musl /lib /libmusl
+RUN mv /libmusl/* /rootfs/lib/
 
 FROM scratch
 COPY --from=build /rootfs /

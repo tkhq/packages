@@ -3,6 +3,10 @@ export SOURCE_DATE_EPOCH = 0
 out/bootstrap.oci.tgz:
 	docker build -t ocirep/bootstrap --output type=oci,dest=$@ packages/bootstrap
 
+out/musl.oci.tgz: \
+	out/musl.oci.tgz
+	docker build -t ocirep/musl --output type=oci,dest=$@ packages/musl
+
 out/gcc.oci.tgz: \
 	out/bootstrap.oci.tgz
 	docker build -t ocirep/gcc --output type=oci,dest=$@ packages/gcc

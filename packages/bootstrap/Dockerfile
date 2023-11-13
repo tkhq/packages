@@ -1,5 +1,5 @@
-FROM buildpack-deps@sha256:8465175ca53f8f2e756d069658b3f353bb3732926b1f33f34332cfbf597ad0c0 as build
+FROM alpine@sha256:eece025e432126ce23f223450a0326fbebde39cdf496a85d8c016293fc851978
 
 RUN set -ex; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends flex
+    apk update; \
+    apk add gcc g++ libc-dev make linux-headers
