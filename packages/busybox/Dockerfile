@@ -1,6 +1,6 @@
-ARG GCC_IMAGE=library/gcc@sha256:ca38f292fe1ad0933f0122a657f9c644ed1f0a9e1aa336abcc83d420ad487e28
+FROM ocirep/bootstrap as bootstrap
 
-FROM ${GCC_IMAGE} as build
+FROM bootstrap as build
 ENV SOURCE_SITE=https://busybox.net/downloads
 ENV SOURCE_VERSION=1.36.1
 ENV SOURCE_HASH=b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e47de314
