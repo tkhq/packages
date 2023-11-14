@@ -56,9 +56,9 @@ RUN ["/busybox","mkdir","/bin"]
 RUN ["/busybox","--install","-s","/bin"]
 RUN echo "user:x:1000:" > /etc/group
 RUN echo "user:x:1000:1000::/home/user:/bin/sh" > /etc/passwd
-RUN mkdir -p /home/user /tmp /lib
+RUN mkdir -p /home/user /tmp /lib /var/tmp
 RUN ln -sT /lib /lib64
-RUN chown -R 1000:1000 /home/user /tmp
+RUN chown -R 1000:1000 /home/user /tmp /var/tmp
 WORKDIR /home/user
 USER 1000:1000
 ENTRYPOINT ["/bin/sh"]
