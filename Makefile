@@ -35,3 +35,9 @@ out/go.oci.tgz: \
 	out/bash.oci.tgz \
 	out/musl.oci.tgz
 	docker build -t ocirep/go --output type=oci,dest=$@ packages/go
+
+test:
+	docker build -t ocirep/go_hello examples/go_hello
+	@printf "\nOcirep Test Suite\n"
+	@printf "go_hello -> "
+	@docker run -i ocirep/go_hello | grep Success
