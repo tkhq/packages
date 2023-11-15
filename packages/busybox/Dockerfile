@@ -2,8 +2,8 @@ FROM ocirep/bootstrap as bootstrap
 
 FROM bootstrap as build
 ENV SOURCE_SITE=https://busybox.net/downloads
-ENV SOURCE_VERSION=1.36.1
-ENV SOURCE_HASH=b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e47de314
+ENV SOURCE_VERSION=1.35.0
+ENV SOURCE_HASH=faeeb244c35a348a334f4a59e44626ee870fb07b6884d68c10ae8bc19f83a694
 RUN wget ${SOURCE_SITE}/busybox-${SOURCE_VERSION}.tar.bz2
 RUN echo "${SOURCE_HASH} busybox-${SOURCE_VERSION}.tar.bz2" | sha256sum -c
 RUN tar -xjf busybox-${SOURCE_VERSION}.tar.bz2
