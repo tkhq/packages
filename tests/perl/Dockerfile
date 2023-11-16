@@ -4,7 +4,7 @@ RUN set -eux; \
   mkdir -p $HOME/rootfs/etc; \
   echo "nogroup:*:100:nobody" > ~/rootfs/etc/group; \
   echo "nobody:*:100:100:::" > ~/rootfs/etc/passwd; \
-  cp main.py $HOME/rootfs/
+  cp main.pl $HOME/rootfs/
 
 FROM scratch
 COPY --from=build --chown=100:100 /home/user/rootfs /
