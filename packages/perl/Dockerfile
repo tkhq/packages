@@ -1,8 +1,8 @@
-FROM ocirep/busybox:latest as busybox
-FROM ocirep/gcc:latest as gcc
-FROM ocirep/binutils:latest as binutils
-FROM ocirep/musl:latest as musl
-FROM ocirep/make:latest as make
+FROM imgrep/busybox:latest as busybox
+FROM imgrep/gcc:latest as gcc
+FROM imgrep/binutils:latest as binutils
+FROM imgrep/musl:latest as musl
+FROM imgrep/make:latest as make
 
 FROM busybox as build
 ENV SRC_SITE=https://www.cpan.org/src/5.0

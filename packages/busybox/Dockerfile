@@ -1,4 +1,4 @@
-FROM ocirep/bootstrap as bootstrap
+FROM imgrep/bootstrap as bootstrap
 
 FROM bootstrap as build
 ENV SOURCE_SITE=https://busybox.net/downloads

@@ -1,8 +1,11 @@
-FROM ocirep/busybox:latest as busybox
-FROM ocirep/bash:latest as bash
-FROM ocirep/gcc:latest as gcc
-FROM ocirep/binutils:latest as binutils
-FROM ocirep/musl:latest as musl
+ARG REGISTRY = imgrep/
+ARG BUSYBOX_VERSION = latest
+FROM ${REGISTRY}busybox:${BUSYBOX_VERSION} as busybox
+
+FROM imgrep/bash:latest as bash
+FROM imgrep/gcc:latest as gcc
+FROM imgrep/binutils:latest as binutils
+FROM imgrep/musl:latest as musl
 
 FROM busybox as stage1
 COPY --from=bash . /bin/

@@ -1,5 +1,5 @@
-FROM ocirep/musl:latest as musl
-FROM ocirep/bootstrap:latest as build
+FROM imgrep/musl:latest as musl
+FROM imgrep/bootstrap:latest as build
 
 ENV GCC_SITE https://mirrors.kernel.org/gnu/gcc
 ENV GCC_VERSION 13.2.0

@@ -1,10 +1,10 @@
-FROM ocirep/busybox:latest as busybox
-FROM ocirep/gcc:latest as gcc
-FROM ocirep/binutils:latest as binutils
-FROM ocirep/musl:latest as musl
-FROM ocirep/make:latest as make
-FROM ocirep/perl:latest as perl
-FROM ocirep/linux-headers:latest as linux-headers
+FROM imgrep/busybox:latest as busybox
+FROM imgrep/gcc:latest as gcc
+FROM imgrep/binutils:latest as binutils
+FROM imgrep/musl:latest as musl
+FROM imgrep/make:latest as make
+FROM imgrep/perl:latest as perl
+FROM imgrep/linux-headers:latest as linux-headers
 
 FROM busybox as build
 COPY --from=gcc . /
@@ -21,15 +21,14 @@ RUN echo "${SRC_HASH}  openssl-${SRC_VERSION}.tar.gz" | sha256sum -c
 RUN tar -xf openssl-${SRC_VERSION}.tar.gz
 WORKDIR openssl-${SRC_VERSION}
 RUN set -eux; \
-    export CC='gcc -fPIE -pie -static'; \
+    export CC='gcc -fPIE -pie'; \
     perl ./Configure \
         --prefix=/usr \
         --libdir=lib \
         --openssldir=/etc/ssl \
-        --static \
-        -static \
+        threads \
         enable-ktls \
-        no-shared \
+        shared \
 		no-zlib \
 		no-async \
 		no-comp \

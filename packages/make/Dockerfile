@@ -1,5 +1,5 @@
-FROM ocirep/musl:latest as musl
-FROM ocirep/bootstrap:latest as build
+FROM imgrep/musl:latest as musl
+FROM imgrep/bootstrap:latest as build
 
 ENV SRC_SITE https://ftp.gnu.org/gnu/make
 ENV SRC_VERSION 4.4

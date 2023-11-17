@@ -1,44 +1,44 @@
 export SOURCE_DATE_EPOCH = 0
 
 out/bootstrap.oci.tgz:
-	docker build -t ocirep/bootstrap --output type=oci,dest=$@ packages/bootstrap
+	docker build -t imgrep/bootstrap --output type=oci,dest=$@ packages/bootstrap
 
 out/musl.oci.tgz: \
 	out/bootstrap.oci.tgz
-	docker build -t ocirep/musl --output type=oci,dest=$@ packages/musl
+	docker build -t imgrep/musl --output type=oci,dest=$@ packages/musl
 
 out/busybox.oci.tgz: \
 	out/bootstrap.oci.tgz
-	docker build -t ocirep/busybox --output type=oci,dest=$@ packages/busybox
+	docker build -t imgrep/busybox --output type=oci,dest=$@ packages/busybox
 
 out/binutils.oci.tgz: \
 	out/bootstrap.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t ocirep/musl --output type=oci,dest=$@ packages/musl
+	docker build -t imgrep/binutils --output type=oci,dest=$@ packages/binutils
 
-out/linux-headers.oci.tgz: \
-	docker build -t ocirep/linux-headers --output type=oci,dest=$@ packages/linux-heades
+out/linux-headers.oci.tgz:
+	docker build -t imgrep/linux-headers --output type=oci,dest=$@ packages/linux-headers
 
 out/gcc.oci.tgz: \
 	out/bootstrap.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t ocirep/gcc --output type=oci,dest=$@ packages/gcc
+	docker build -t imgrep/gcc --output type=oci,dest=$@ packages/gcc
 
 out/make.oci.tgz: \
 	out/bootstrap.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t ocirep/make --output type=oci,dest=$@ packages/make
+	docker build -t imgrep/make --output type=oci,dest=$@ packages/make
 
 out/bash.oci.tgz: \
 	out/gcc.oci.tgz
-	docker build -t ocirep/bash --output type=oci,dest=$@ packages/bash
+	docker build -t imgrep/bash --output type=oci,dest=$@ packages/bash
 
 out/openssl.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/binutils.oci.tgz \
 	out/busybox.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t ocirep/openssl --output type=oci,dest=$@ packages/openssl
+	docker build -t imgrep/openssl --output type=oci,dest=$@ packages/openssl
 
 out/go.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -46,14 +46,14 @@ out/go.oci.tgz: \
 	out/busybox.oci.tgz \
 	out/bash.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t ocirep/go --output type=oci,dest=$@ packages/go
+	docker build -t imgrep/go --output type=oci,dest=$@ packages/go
 
 out/perl.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/binutils.oci.tgz \
 	out/busybox.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t ocirep/perl --output type=oci,dest=$@ packages/perl
+	docker build -t imgrep/perl --output type=oci,dest=$@ packages/perl
 
 out/python.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -63,16 +63,16 @@ out/python.oci.tgz: \
 	out/openssl.oci.tgz \
 	out/make.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t ocirep/python --output type=oci,dest=$@ packages/python
+	docker build -t imgrep/python --output type=oci,dest=$@ packages/python
 
 test:
-	docker build -t ocirep/test-c tests/c
-	docker build -t ocirep/test-go tests/go
-	docker build -t ocirep/test-perl tests/perl
+	docker build -t imgrep/test-c tests/c
+	docker build -t imgrep/test-go tests/go
+	docker build -t imgrep/test-perl tests/perl
 	@printf "\nOcirep Test Suite\n"
 	@printf "go -> "
-	@docker run -i ocirep/test-go | grep Success
+	@docker run -i imgrep/test-go | grep Success
 	@printf "c -> "
-	@docker run -i ocirep/test-c | grep Success
+	@docker run -i imgrep/test-c | grep Success
 	@printf "perl -> "
-	@docker run -i ocirep/test-perl | grep Success
+	@docker run -i imgrep/test-perl | grep Success

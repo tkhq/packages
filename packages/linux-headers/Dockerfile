@@ -1,5 +1,5 @@
-FROM ocirep/musl:latest as musl
-FROM ocirep/bootstrap:latest as build
+FROM imgrep/musl:latest as musl
+FROM imgrep/bootstrap:latest as build
 
 ENV SRC_SITE https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/
 ENV SRC_VERSION 6.6
