@@ -15,18 +15,29 @@ RUN set -ex; \
 
 RUN set -ex; \
 	./configure \
-		--build="x86_64-linux-musl" \
-		--host="x86_64-linux-musl" \
+        --target=x86_64-linux-musl \
+		--build=x86_64-linux-musl \
+		--host=x86_64-linux-musl \
+        --prefix /usr \
+        --mandir=/usr/share/man \
+        --infodir=/usr/share/info \
+        --disable-cet \
+		--disable-fixed-point \
+		--disable-libstdcxx-pch \
 		--disable-multilib \
+		--disable-nls \
+		--disable-werror \
+        --enable-__cxa_atexit \
+		--enable-default-pie \
+		--enable-default-ssp \
 		--enable-languages=c,c++ \
-        --prefix /rootfs \
-	; \
-	make -j "$(nproc)"; \
-	make install-strip
-COPY --from=musl /lib /libmusl
-RUN mv /libmusl/* /rootfs/lib/
+		--enable-link-serialization=2 \
+		--enable-linker-build-id; \
+	make -j "$(nproc)"
+RUN make DESTDIR=/home/user/rootfs/ install-strip
+COPY --from=musl /lib/* /home/user/rootfs/lib/
 
 FROM scratch
-COPY --from=build /rootfs /
-ENTRYPOINT ["/bin/gcc"]
+COPY --from=build /home/user/rootfs /
+ENTRYPOINT ["/usr/bin/gcc"]
 CMD ["--version"]
