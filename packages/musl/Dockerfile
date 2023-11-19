@@ -9,9 +9,15 @@ RUN echo "${SRC_HASH} musl-${SRC_VERSION}.tar.gz" | sha256sum -c
 RUN tar -xzf musl-${SRC_VERSION}.tar.gz
 WORKDIR musl-${SRC_VERSION}
 RUN set -ex; \
-	./configure \
-        --prefix=/; \
-	make DESTDIR=/rootfs install;
+    ./configure \
+        --build=x86_64-linux-musl \
+        --host=x86_64-linux-musl \
+        --prefix=/usr \
+        --sysconfdir=/etc \
+        --mandir=/usr/share/man \
+        --infodir=/usr/share/info \
+        --localstatedir=/var; \
+    make DESTDIR=/home/user/rootfs install;
 
 FROM scratch
-COPY --from=build /rootfs /
+COPY --from=build /home/user/rootfs /
