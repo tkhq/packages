@@ -29,6 +29,9 @@ out/make.oci.tgz: \
 	out/musl.oci.tgz
 	docker build -t imgrep/make --output type=oci,dest=$@ packages/make
 
+out/ca-certificates.oci.tgz:
+	docker build -t imgrep/ca-certificates --output type=oci,dest=$@ packages/ca-certificates
+
 out/bash.oci.tgz: \
 	out/gcc.oci.tgz
 	docker build -t imgrep/bash --output type=oci,dest=$@ packages/bash
@@ -54,6 +57,16 @@ out/perl.oci.tgz: \
 	out/busybox.oci.tgz \
 	out/musl.oci.tgz
 	docker build -t imgrep/perl --output type=oci,dest=$@ packages/perl
+
+out/curl.oci.tgz: \
+	out/gcc.oci.tgz \
+	out/musl.oci.tgz \
+	out/busybox.oci.tgz \
+	out/make.oci.tgz \
+	out/binutils.oci.tgz \
+	out/openssl.oci.tgz \
+	out/ca-certificates.oci.tgz
+	docker build -t imgrep/curl --output type=oci,dest=$@ packages/curl
 
 out/python.oci.tgz: \
 	out/gcc.oci.tgz \

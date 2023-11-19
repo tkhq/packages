@@ -20,7 +20,7 @@ RUN set -ex; \
         --disable-nls; \
 	make -j "$(nproc)"; \
 	make DESTDIR="/rootfs" install;
-COPY --from=musl /lib/libc.so /rootfs/lib/ld-musl-x86_64.so.1
+COPY --from=musl /usr/lib/libc.so /rootfs/lib/ld-musl-x86_64.so.1
 
 FROM scratch
 COPY --from=build /rootfs /
