@@ -40,6 +40,7 @@ out/openssl.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/binutils.oci.tgz \
 	out/busybox.oci.tgz \
+	out/linux-headers.oci.tgz \
 	out/musl.oci.tgz
 	docker build -t imgrep/openssl --output type=oci,dest=$@ packages/openssl
 
@@ -55,6 +56,7 @@ out/perl.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/binutils.oci.tgz \
 	out/busybox.oci.tgz \
+	out/make.oci.tgz \
 	out/musl.oci.tgz
 	docker build -t imgrep/perl --output type=oci,dest=$@ packages/perl
 
@@ -77,6 +79,43 @@ out/python.oci.tgz: \
 	out/make.oci.tgz \
 	out/musl.oci.tgz
 	docker build -t imgrep/python --output type=oci,dest=$@ packages/python
+
+out/ninja.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	out/openssl.oci.tgz \
+	out/python.oci.tgz
+	docker build -t imgrep/ninja --output type=oci,dest=$@ packages/ninja
+
+out/cmake.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/ninja.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	out/linux-headers.oci.tgz
+	docker build -t imgrep/cmake --output type=oci,dest=$@ packages/cmake
+
+out/py-setuptools.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/python.oci.tgz
+	docker build -t imgrep/py-setuptools --output type=oci,dest=$@ packages/py-setuptools
+
+out/llvm.oci.tgz: \
+	out/gcc.oci.tgz \
+	out/python.oci.tgz \
+	out/py-setuptools.oci.tgz \
+	out/perl.oci.tgz \
+	out/binutils.oci.tgz \
+	out/cmake.oci.tgz \
+	out/ninja.oci.tgz \
+	out/busybox.oci.tgz \
+	out/musl.oci.tgz
+	docker build -t imgrep/llvm --output type=oci,dest=$@ packages/llvm
 
 test:
 	docker build -t imgrep/test-c tests/c

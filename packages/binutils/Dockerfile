@@ -18,20 +18,20 @@ RUN set -ex; \
         --target=x86_64-linux-musl \
         --with-build-sysroot= \
         --with-sysroot=/ \
-        --prefix=/ \
+        --prefix=/usr \
         --mandir=/usr/share/man \
         --infodir=/usr/share/info \
         --sysconfdir=/etc \
         --enable-plugins \
         --without-zstd \
         --disable-shared \
-        --disable-gold \
         --disable-jansson \
         --disable-gdb \
         --disable-gprofng \
         --disable-multilib \
         --disable-nls \
         --disable-werror \
+        --enable-gold \
         --enable-64-bit-bfd \
         --enable-default-execstack=no \
         --enable-default-hash-style=gnu \
@@ -43,10 +43,10 @@ RUN set -ex; \
         --with-mmap \
         --with-pic; \
 	make -j "$(nproc)"; \
-	make DESTDIR="/rootfs" install;
+	make DESTDIR="/home/user/rootfs" install;
 COPY --from=musl /usr/lib/libc.so /rootfs/lib/ld-musl-x86_64.so.1
 
 FROM scratch
-COPY --from=build /rootfs /
+COPY --from=build /home/user/rootfs /
 ENTRYPOINT ["/bin/ld"]
 CMD ["--version"]

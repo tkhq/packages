@@ -46,7 +46,7 @@ RUN set -eux; \
 		-Dusenm; \
     make; \
     make DESTDIR=/home/user/rootfs install
-COPY --from=musl /lib/libc.so /home/user/rootfs/lib/ld-musl-x86_64.so.1
+COPY --from=musl /usr/lib/libc.so /home/user/rootfs/lib/ld-musl-x86_64.so.1
 
 FROM scratch
 COPY --from=build /home/user/rootfs /
