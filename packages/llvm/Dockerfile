@@ -62,16 +62,17 @@ RUN set -eux; \
 		-DLLVM_INSTALL_UTILS=ON \
 		-DLLVM_LINK_LLVM_DYLIB=ON \
 		-DLLVM_USE_PERF=ON; \
-	cmake --build build
-
-RUN python3 llvm/utils/lit/setup.py build
+	cmake --build build; \
+    python3 llvm/utils/lit/setup.py build
 
 RUN set -eux; \
     export DESTDIR="/home/user/rootfs/"; \
     cmake --install build; \
 	python3 llvm/utils/lit/setup.py install --root="$DESTDIR"
 
-COPY --from=musl /lib* /home/user/rootfs/lib/
+COPY --from=musl /lib/* /home/user/rootfs/lib/
+COPY --from=gcc /usr/lib/* /home/user/rootfs/usr/lib/
+COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
 
 FROM scratch
 COPY --from=build /home/user/rootfs /
