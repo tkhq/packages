@@ -2,9 +2,10 @@ FROM imgrep/musl:latest as musl
 FROM imgrep/bootstrap:latest as build
 
 ENV GCC_SITE https://mirrors.kernel.org/gnu/gcc
-ENV GCC_VERSION 13.2.0
-ENV GCC_HASH e275e76442a6067341a27f04c5c6b83d8613144004c0413528863dc6b5c743da
+ENV GCC_VERSION 12.2.0
+ENV GCC_HASH e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff
 
+RUN echo wget ${GCC_SITE}/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.xz
 RUN wget ${GCC_SITE}/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.xz
 RUN echo "${GCC_HASH} gcc-${GCC_VERSION}.tar.xz" | sha256sum -c
 RUN tar -xf gcc-${GCC_VERSION}.tar.xz
@@ -35,7 +36,9 @@ RUN set -ex; \
 		--enable-link-serialization=2 \
 		--enable-linker-build-id; \
 	make -j "$(nproc)"
-RUN make DESTDIR=/home/user/rootfs/ install-strip
+RUN set -eux; \
+    make DESTDIR=/home/user/rootfs/ install-strip; \
+    ln -s gcc /home/user/rootfs/usr/bin/cc
 COPY --from=musl /lib/* /home/user/rootfs/lib/
 
 FROM scratch

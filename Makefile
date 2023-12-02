@@ -105,6 +105,14 @@ out/py-setuptools.oci.tgz: \
 	out/python.oci.tgz
 	docker build -t imgrep/py-setuptools --output type=oci,dest=$@ packages/py-setuptools
 
+out/zlib.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz
+	docker build -t imgrep/zlib --output type=oci,dest=$@ packages/zlib
+
 out/llvm.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/python.oci.tgz \
@@ -116,6 +124,18 @@ out/llvm.oci.tgz: \
 	out/busybox.oci.tgz \
 	out/musl.oci.tgz
 	docker build -t imgrep/llvm --output type=oci,dest=$@ packages/llvm
+
+out/rust.oci.tgz: \
+	out/gcc.oci.tgz \
+	out/bash.oci.tgz \
+	out/zlib.oci.tgz \
+	out/python.oci.tgz \
+	out/binutils.oci.tgz \
+	out/cmake.oci.tgz \
+	out/make.oci.tgz \
+	out/busybox.oci.tgz \
+	out/musl.oci.tgz
+	docker build -t imgrep/rust --output type=oci,dest=$@ packages/rust
 
 test:
 	docker build -t imgrep/test-c tests/c

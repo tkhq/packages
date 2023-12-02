@@ -11,7 +11,11 @@ RUN wget ${SRC_SITE}/releases/musl-$SRC_VERSION.tar.gz
 RUN echo "${SRC_HASH} musl-${SRC_VERSION}.tar.gz" | sha256sum -c
 RUN tar -xzf musl-${SRC_VERSION}.tar.gz
 WORKDIR musl-${SRC_VERSION}
+ADD lfs64.patch .
+ADD lfs64-2.patch .
 RUN set -eux; \
+    patch -p1 < lfs64.patch; \
+    patch -p1 < lfs64-2.patch; \
     ./configure \
         --build=x86_64-linux-musl \
         --host=x86_64-linux-musl \
