@@ -125,6 +125,18 @@ out/llvm.oci.tgz: \
 	out/musl.oci.tgz
 	docker build -t imgrep/llvm --output type=oci,dest=$@ packages/llvm
 
+out/llvm13.oci.tgz: \
+	out/gcc.oci.tgz \
+	out/python.oci.tgz \
+	out/py-setuptools.oci.tgz \
+	out/perl.oci.tgz \
+	out/binutils.oci.tgz \
+	out/cmake.oci.tgz \
+	out/ninja.oci.tgz \
+	out/busybox.oci.tgz \
+	out/musl.oci.tgz
+	docker build -t imgrep/llvm13 --output type=oci,dest=$@ packages/llvm13
+
 out/rust.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/bash.oci.tgz \
