@@ -1,6 +1,7 @@
 # ImgRep
 
-Repository of reproducibly built images with reputation anchored signatures.
+Repository of reproducibly built images of common open source Linux toolchains
+and software with reputation anchored signatures.
 
 ## About
 
