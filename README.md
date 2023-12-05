@@ -1,6 +1,6 @@
 # ImgRep
 
-Repository of reproducible builds anchored to reputation anchored signatures.
+Repository of reproducibly built images with reputation anchored signatures.
 
 ## About
 
