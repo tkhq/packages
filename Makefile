@@ -36,6 +36,35 @@ out/bash.oci.tgz: \
 	out/gcc.oci.tgz
 	docker build -t imgrep/bash --output type=oci,dest=$@ packages/bash
 
+out/m4.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	docker build -t imgrep/m4 --output type=oci,dest=$@ packages/m4
+
+out/autoconf.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	out/perl.oci.tgz \
+	out/m4.oci.tgz
+	docker build -t imgrep/autoconf --output type=oci,dest=$@ packages/autoconf
+
+out/automake.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	out/perl.oci.tgz \
+	out/autoconf.oci.tgz \
+	out/m4.oci.tgz
+	docker build -t imgrep/automake --output type=oci,dest=$@ packages/automake
+
 out/openssl.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/binutils.oci.tgz \
