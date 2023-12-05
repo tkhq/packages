@@ -65,6 +65,50 @@ out/automake.oci.tgz: \
 	out/m4.oci.tgz
 	docker build -t imgrep/automake --output type=oci,dest=$@ packages/automake
 
+out/sed.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz
+	docker build -t imgrep/sed --output type=oci,dest=$@ packages/sed
+
+out/libtool.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	out/bash.oci.tgz \
+	out/sed.oci.tgz \
+	out/m4.oci.tgz
+	docker build -t imgrep/libtool --output type=oci,dest=$@ packages/libtool
+
+out/pkgconf.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	out/libtool.oci.tgz
+	docker build -t imgrep/pkgconf --output type=oci,dest=$@ packages/pkgconf
+
+out/libxml2.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	out/bash.oci.tgz \
+	out/python.oci.tgz \
+	out/sed.oci.tgz \
+	out/m4.oci.tgz \
+	out/autoconf.oci.tgz \
+	out/automake.oci.tgz \
+	out/pkgconf.oci.tgz \
+	out/libtool.oci.tgz
+	docker build -t imgrep/libxml2 --output type=oci,dest=$@ packages/libxml2
+
 out/openssl.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/binutils.oci.tgz \
