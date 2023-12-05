@@ -43,31 +43,33 @@ models that assume any single human can be hacked or coerced.
     * Currently Docker supported, but will support buildah and podman
 * Gnu Make
 
-## Compile all packages
+### Examples
+
+#### Compile all packages
 
 ```
 make
 ```
 
-## Compile specific package
+#### Compile specific package
 
 ```
 make out/rust.tgz
 ```
 
-## Reproduce all changed packages
+#### Reproduce all changed packages
 
 ```
 make reproduce
 ```
 
-## Reproduce all packages without cache
+#### Reproduce all packages without cache
 
 ```
 make clean reproduce
 ```
 
-## Sign current manifest of package hashes
+#### Sign current manifest of package hashes
 
 ```
 make sign
