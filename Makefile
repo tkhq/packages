@@ -41,7 +41,7 @@ out/m4.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/binutils.oci.tgz \
 	out/musl.oci.tgz \
-	out/make.oci.tgz \
+	out/make.oci.tgz
 	docker build -t imgrep/m4 --output type=oci,dest=$@ m4
 
 out/autoconf.oci.tgz: \
@@ -108,6 +108,18 @@ out/libxml2.oci.tgz: \
 	out/pkgconf.oci.tgz \
 	out/libtool.oci.tgz
 	docker build -t imgrep/libxml2 --output type=oci,dest=$@ libxml2
+
+out/libunwind.oci.tgz: \
+	out/busybox.oci.tgz \
+	out/gcc.oci.tgz \
+	out/binutils.oci.tgz \
+	out/musl.oci.tgz \
+	out/make.oci.tgz \
+	out/bash.oci.tgz \
+	out/autoconf.oci.tgz \
+	out/automake.oci.tgz \
+	out/libtool.oci.tgz
+	docker build -t imgrep/libunwind --output type=oci,dest=$@ libunwind
 
 out/openssl.oci.tgz: \
 	out/gcc.oci.tgz \
