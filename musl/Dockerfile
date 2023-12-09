@@ -30,7 +30,7 @@ RUN set -eux; \
 RUN set -eux; \
     make DESTDIR=/home/user/rootfs install; \
     mkdir -p /home/user/rootfs/usr/bin; \
-    printf "%s\n%s\n" '#!/bin/sh' 'exec /lib/ld-musl-x86_64.so.1 --list "\$@"' \
+    printf "%s\n%s\n" '#!/bin/sh' 'exec /lib/ld-musl-x86_64.so.1 --list "$@"' \
         > /home/user/rootfs/usr/bin/ldd; \
     chmod 755 /home/user/rootfs/usr/bin/ldd; \
     mv -f /home/user/rootfs/usr/lib/libc.so /home/user/rootfs/lib/ld-musl-x86_64.so.1; \
