@@ -1,11 +1,10 @@
-ARG REGISTRY = imgrep/
+ARG REGISTRY = local
 ARG BUSYBOX_VERSION = latest
-FROM ${REGISTRY}busybox:${BUSYBOX_VERSION} as busybox
-
-FROM imgrep/bash:latest as bash
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
+FROM ${REGISTRY}/busybox:${BUSYBOX_VERSION} as busybox
+FROM ${REGISTRY}/bash:latest as bash
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
 
 FROM busybox as stage1
 COPY --from=bash . /bin/

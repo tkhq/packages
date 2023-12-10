@@ -1,5 +1,6 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/python:latest as python
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/python:latest as python
 
 FROM busybox as build
 ENV SRC_SITE=https://pypi.io/packages/source/s/setuptools

@@ -1,5 +1,6 @@
-FROM imgrep/musl:latest as musl
-FROM imgrep/bootstrap:latest as build
+ARG REGISTRY=local
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/bootstrap:latest as build
 
 ENV SRC_SITE https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/
 ENV SRC_VERSION 6.6

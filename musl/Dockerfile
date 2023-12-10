@@ -1,4 +1,5 @@
-FROM imgrep/bootstrap:latest as build
+ARG REGISTRY=local
+FROM ${REGISTRY}/bootstrap:latest as build
 
 ENV SRC_SITE http://musl.libc.org
 ENV SRC_VERSION 1.2.4

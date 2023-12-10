@@ -1,11 +1,12 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
-FROM imgrep/make:latest as make
-FROM imgrep/perl:latest as perl
-FROM imgrep/autoconf:latest as autoconf
-FROM imgrep/m4:latest as m4
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/make:latest as make
+FROM ${REGISTRY}/perl:latest as perl
+FROM ${REGISTRY}/autoconf:latest as autoconf
+FROM ${REGISTRY}/m4:latest as m4
 
 FROM busybox as build
 ENV SRC_SITE=https://ftp.gnu.org/gnu/automake

@@ -1,5 +1,6 @@
-FROM imgrep/musl:latest as musl
-FROM imgrep/bootstrap:latest as build
+ARG REGISTRY=local
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/bootstrap:latest as build
 
 ENV GCC_SITE https://mirrors.kernel.org/gnu/gcc
 ENV GCC_VERSION 12.2.0

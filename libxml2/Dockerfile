@@ -1,14 +1,15 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
-FROM imgrep/make:latest as make
-FROM imgrep/autoconf:latest as autoconf
-FROM imgrep/automake:latest as automake
-FROM imgrep/libtool:latest as libtool
-FROM imgrep/pkgconf:latest as pkgconf
-FROM imgrep/python:latest as python
-FROM imgrep/m4:latest as m4
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/make:latest as make
+FROM ${REGISTRY}/autoconf:latest as autoconf
+FROM ${REGISTRY}/automake:latest as automake
+FROM ${REGISTRY}/libtool:latest as libtool
+FROM ${REGISTRY}/pkgconf:latest as pkgconf
+FROM ${REGISTRY}/python:latest as python
+FROM ${REGISTRY}/m4:latest as m4
 
 FROM busybox as build
 ENV SRC_SITE=https://gitlab.gnome.org/GNOME/libxml2/-/archive

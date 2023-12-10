@@ -1,5 +1,6 @@
-FROM imgrep/musl:latest as musl
-FROM imgrep/bootstrap:latest as build
+ARG REGISTRY=local
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/bootstrap:latest as build
 
 ENV SRC_SITE https://ftp.gnu.org/gnu/binutils
 ENV SRC_VERSION 2.41

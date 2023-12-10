@@ -1,6 +1,7 @@
-ARG GCC_IMAGE=library/gcc@sha256:ca38f292fe1ad0933f0122a657f9c644ed1f0a9e1aa336abcc83d420ad487e28
+ARG REGISTRY=local
+from ${REGISTRY}/bootstrap as bootstrap
 
-FROM ${GCC_IMAGE} as build
+FROM bootstrap as build
 ENV SOURCE_SITE=https://ftp.gnu.org/gnu/bash
 ENV SOURCE_VERSION=5.2.15
 ENV SOURCE_HASH=13720965b5f4fc3a0d4b61dd37e7565c741da9a5be24edc2ae00182fc1b3588c

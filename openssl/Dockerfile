@@ -1,10 +1,11 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
-FROM imgrep/make:latest as make
-FROM imgrep/perl:latest as perl
-FROM imgrep/linux-headers:latest as linux-headers
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/make:latest as make
+FROM ${REGISTRY}/perl:latest as perl
+FROM ${REGISTRY}/linux-headers:latest as linux-headers
 
 FROM busybox as build
 COPY --from=gcc . /

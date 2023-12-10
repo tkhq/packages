@@ -1,12 +1,13 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
-FROM imgrep/curl:latest as curl
-FROM imgrep/ninja:latest as ninja
-FROM imgrep/openssl:latest as openssl
-FROM imgrep/linux-headers:latest as linux-headers
-FROM imgrep/make:latest as make
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/curl:latest as curl
+FROM ${REGISTRY}/ninja:latest as ninja
+FROM ${REGISTRY}/openssl:latest as openssl
+FROM ${REGISTRY}/linux-headers:latest as linux-headers
+FROM ${REGISTRY}/make:latest as make
 
 FROM busybox as build
 ENV SRC_SITE=https://cmake.org/files

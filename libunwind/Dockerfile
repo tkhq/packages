@@ -1,11 +1,12 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
-FROM imgrep/make:latest as make
-FROM imgrep/autoconf:latest as autoconf
-FROM imgrep/automake:latest as automake
-FROM imgrep/libtool:latest as libtool
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/make:latest as make
+FROM ${REGISTRY}/autoconf:latest as autoconf
+FROM ${REGISTRY}/automake:latest as automake
+FROM ${REGISTRY}/libtool:latest as libtool
 
 FROM busybox as build
 ENV SRC_SITE=https://github.com/libunwind/libunwind/releases/download

@@ -1,9 +1,10 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
-FROM imgrep/make:latest as make
-FROM imgrep/openssl:latest as openssl
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/make:latest as make
+FROM ${REGISTRY}/openssl:latest as openssl
 
 FROM busybox as build
 ENV SRC_SITE=https://www.python.org/ftp/python

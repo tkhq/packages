@@ -1,11 +1,12 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
-FROM imgrep/make:latest as make
-FROM imgrep/m4:latest as m4
-FROM imgrep/bash:latest as bash
-FROM imgrep/sed:latest as sed
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/make:latest as make
+FROM ${REGISTRY}/m4:latest as m4
+FROM ${REGISTRY}/bash:latest as bash
+FROM ${REGISTRY}/sed:latest as sed
 
 FROM busybox as build
 ENV SRC_SITE=https://ftp.gnu.org/gnu/libtool

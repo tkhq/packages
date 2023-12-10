@@ -1,7 +1,8 @@
-# ImgRep
+# Packages
 
-Repository of reproducibly built images of common open source Linux toolchains
-and software with reputation anchored signatures.
+Repository of reproducibly built packages of common open source Linux
+toolchains and software with reputation anchored signatures, built and
+distributed as OCI images.
 
 ## About
 

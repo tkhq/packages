@@ -1,12 +1,13 @@
-FROM imgrep/busybox:latest as busybox
-FROM imgrep/gcc:latest as gcc
-FROM imgrep/binutils:latest as binutils
-FROM imgrep/musl:latest as musl
-FROM imgrep/openssl:latest as openssl
-FROM imgrep/python:latest as python
-FROM imgrep/py-setuptools:latest as py-setuptools
-FROM imgrep/cmake:latest as cmake
-FROM imgrep/ninja:latest as ninja
+ARG REGISTRY=local
+FROM ${REGISTRY}/busybox:latest as busybox
+FROM ${REGISTRY}/gcc:latest as gcc
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/openssl:latest as openssl
+FROM ${REGISTRY}/python:latest as python
+FROM ${REGISTRY}/py-setuptools:latest as py-setuptools
+FROM ${REGISTRY}/cmake:latest as cmake
+FROM ${REGISTRY}/ninja:latest as ninja
 
 FROM busybox as build
 ENV SRC_SITE=https://github.com/llvm/llvm-project/releases/download

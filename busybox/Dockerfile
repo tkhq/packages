@@ -1,4 +1,5 @@
-FROM imgrep/bootstrap as bootstrap
+ARG REGISTRY=local
+FROM ${REGISTRY}/bootstrap as bootstrap
 
 FROM bootstrap as build
 ENV SOURCE_SITE=https://busybox.net/downloads

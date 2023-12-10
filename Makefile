@@ -1,40 +1,52 @@
 export SOURCE_DATE_EPOCH = 0
+export REGISTRY := local
+export BUILDER := $(shell which docker)
+
+define build
+	${BUILDER} \
+		build \
+		-t $(REGISTRY)/$(1):$(2) \
+		--build-arg REGISTRY=$(REGISTRY) \
+		--target $(3) \
+		--output type=oci,dest=$@ \
+		$(1)
+endef
 
 out/bootstrap.oci.tgz:
-	docker build -t imgrep/bootstrap --output type=oci,dest=$@ bootstrap
+	$(call build,bootstrap)
 
 out/musl.oci.tgz: \
 	out/bootstrap.oci.tgz
-	docker build -t imgrep/musl --output type=oci,dest=$@ musl
+	$(call build,musl)
 
 out/busybox.oci.tgz: \
 	out/bootstrap.oci.tgz
-	docker build -t imgrep/busybox --output type=oci,dest=$@ busybox
+	$(call build,busybox)
 
 out/binutils.oci.tgz: \
 	out/bootstrap.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/binutils --output type=oci,dest=$@ binutils
+	$(call build,binutils)
 
 out/linux-headers.oci.tgz:
-	docker build -t imgrep/linux-headers --output type=oci,dest=$@ linux-headers
+	$(call build,linux-headers)
 
 out/gcc.oci.tgz: \
 	out/bootstrap.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/gcc --output type=oci,dest=$@ gcc
+	$(call build,gcc)
 
 out/make.oci.tgz: \
 	out/bootstrap.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/make --output type=oci,dest=$@ make
+	$(call build,make)
 
 out/ca-certificates.oci.tgz:
-	docker build -t imgrep/ca-certificates --output type=oci,dest=$@ ca-certificates
+	$(call build,ca-certificates)
 
 out/bash.oci.tgz: \
 	out/gcc.oci.tgz
-	docker build -t imgrep/bash --output type=oci,dest=$@ bash
+	$(call build,bash)
 
 out/m4.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -42,7 +54,7 @@ out/m4.oci.tgz: \
 	out/binutils.oci.tgz \
 	out/musl.oci.tgz \
 	out/make.oci.tgz
-	docker build -t imgrep/m4 --output type=oci,dest=$@ m4
+	$(call build,m4)
 
 out/autoconf.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -52,7 +64,7 @@ out/autoconf.oci.tgz: \
 	out/make.oci.tgz \
 	out/perl.oci.tgz \
 	out/m4.oci.tgz
-	docker build -t imgrep/autoconf --output type=oci,dest=$@ autoconf
+	$(call build,autoconf)
 
 out/automake.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -63,7 +75,7 @@ out/automake.oci.tgz: \
 	out/perl.oci.tgz \
 	out/autoconf.oci.tgz \
 	out/m4.oci.tgz
-	docker build -t imgrep/automake --output type=oci,dest=$@ automake
+	$(call build,automake)
 
 out/sed.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -71,7 +83,7 @@ out/sed.oci.tgz: \
 	out/binutils.oci.tgz \
 	out/musl.oci.tgz \
 	out/make.oci.tgz
-	docker build -t imgrep/sed --output type=oci,dest=$@ sed
+	$(call build,sed)
 
 out/libtool.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -82,7 +94,7 @@ out/libtool.oci.tgz: \
 	out/bash.oci.tgz \
 	out/sed.oci.tgz \
 	out/m4.oci.tgz
-	docker build -t imgrep/libtool --output type=oci,dest=$@ libtool
+	$(call build,libtool)
 
 out/pkgconf.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -91,7 +103,7 @@ out/pkgconf.oci.tgz: \
 	out/musl.oci.tgz \
 	out/make.oci.tgz \
 	out/libtool.oci.tgz
-	docker build -t imgrep/pkgconf --output type=oci,dest=$@ pkgconf
+	$(call build,pkgconf)
 
 out/libxml2.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -107,7 +119,7 @@ out/libxml2.oci.tgz: \
 	out/automake.oci.tgz \
 	out/pkgconf.oci.tgz \
 	out/libtool.oci.tgz
-	docker build -t imgrep/libxml2 --output type=oci,dest=$@ libxml2
+	$(call build,libxml2)
 
 out/libunwind.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -119,7 +131,7 @@ out/libunwind.oci.tgz: \
 	out/autoconf.oci.tgz \
 	out/automake.oci.tgz \
 	out/libtool.oci.tgz
-	docker build -t imgrep/libunwind --output type=oci,dest=$@ libunwind
+	$(call build,libunwind)
 
 out/openssl.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -127,7 +139,7 @@ out/openssl.oci.tgz: \
 	out/busybox.oci.tgz \
 	out/linux-headers.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/openssl --output type=oci,dest=$@ openssl
+	$(call build,openssl)
 
 out/go.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -135,7 +147,7 @@ out/go.oci.tgz: \
 	out/busybox.oci.tgz \
 	out/bash.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/go --output type=oci,dest=$@ go
+	$(call build,go)
 
 out/perl.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -143,7 +155,7 @@ out/perl.oci.tgz: \
 	out/busybox.oci.tgz \
 	out/make.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/perl --output type=oci,dest=$@ perl
+	$(call build,perl)
 
 out/curl.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -153,7 +165,7 @@ out/curl.oci.tgz: \
 	out/binutils.oci.tgz \
 	out/openssl.oci.tgz \
 	out/ca-certificates.oci.tgz
-	docker build -t imgrep/curl --output type=oci,dest=$@ curl
+	$(call build,curl)
 
 out/python.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -163,7 +175,7 @@ out/python.oci.tgz: \
 	out/openssl.oci.tgz \
 	out/make.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/python --output type=oci,dest=$@ python
+	$(call build,python)
 
 out/ninja.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -173,7 +185,7 @@ out/ninja.oci.tgz: \
 	out/make.oci.tgz \
 	out/openssl.oci.tgz \
 	out/python.oci.tgz
-	docker build -t imgrep/ninja --output type=oci,dest=$@ ninja
+	$(call build,ninja)
 
 out/cmake.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -183,12 +195,12 @@ out/cmake.oci.tgz: \
 	out/musl.oci.tgz \
 	out/make.oci.tgz \
 	out/linux-headers.oci.tgz
-	docker build -t imgrep/cmake --output type=oci,dest=$@ cmake
+	$(call build,cmake)
 
 out/py-setuptools.oci.tgz: \
 	out/busybox.oci.tgz \
 	out/python.oci.tgz
-	docker build -t imgrep/py-setuptools --output type=oci,dest=$@ py-setuptools
+	$(call build,py-setuptools)
 
 out/zlib.oci.tgz: \
 	out/busybox.oci.tgz \
@@ -196,7 +208,7 @@ out/zlib.oci.tgz: \
 	out/binutils.oci.tgz \
 	out/musl.oci.tgz \
 	out/make.oci.tgz
-	docker build -t imgrep/zlib --output type=oci,dest=$@ zlib
+	$(call build,zlib)
 
 out/llvm.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -208,7 +220,7 @@ out/llvm.oci.tgz: \
 	out/ninja.oci.tgz \
 	out/busybox.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/llvm --output type=oci,dest=$@ llvm
+	$(call build,llvm)
 
 out/llvm13.oci.tgz: \
 	out/gcc.oci.tgz \
@@ -220,28 +232,36 @@ out/llvm13.oci.tgz: \
 	out/ninja.oci.tgz \
 	out/busybox.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/llvm13 --output type=oci,dest=$@ llvm13
+	$(call build,llvm13)
 
-out/rust.oci.tgz: \
+out/rust1.54.oci.tgz: \
 	out/gcc.oci.tgz \
 	out/bash.oci.tgz \
 	out/zlib.oci.tgz \
 	out/python.oci.tgz \
+	out/py-setuptools.oci.tgz \
+	out/curl.oci.tgz \
+	out/perl.oci.tgz \
+	out/libunwind.oci.tgz \
+	out/llvm13.oci.tgz \
 	out/binutils.oci.tgz \
 	out/cmake.oci.tgz \
 	out/make.oci.tgz \
 	out/busybox.oci.tgz \
 	out/musl.oci.tgz
-	docker build -t imgrep/rust --output type=oci,dest=$@ rust
+	$(call build,rust,1.54.0,bootstrap)
+
+out/rust1.55.oci.tgz: out/rust1.54.oci.tgz
+	$(call build,rust,1.55.0)
 
 test:
-	docker build -t imgrep/test-c tests/c
-	docker build -t imgrep/test-go tests/go
-	docker build -t imgrep/test-perl tests/perl
+	docker build -t $(REGISTRY)/test-c tests/c
+	docker build -t $(REGISTRY)/test-go tests/go
+	docker build -t $(REGISTRY)/test-perl tests/perl
 	@printf "\nOcirep Test Suite\n"
 	@printf "go -> "
-	@docker run -i imgrep/test-go | grep Success
+	@docker run -i $(REGISTRY)/test-go | grep Success
 	@printf "c -> "
-	@docker run -i imgrep/test-c | grep Success
+	@docker run -i $(REGISTRY)/test-c | grep Success
 	@printf "perl -> "
-	@docker run -i imgrep/test-perl | grep Success
+	@docker run -i $(REGISTRY)/test-perl | grep Success
