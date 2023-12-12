@@ -1,10 +1,12 @@
 # Packages
 
-Repository of reproducibly built packages of common open source Linux
-toolchains and software with reputation anchored signatures, built and
-distributed as OCI images.
+Minimalism and security first repository of reproducible and signed OCI images
+of common open source software packages built from source.
 
-## About
+These can be used as a secure supply chain for anything from obtaining local
+tools, to bootstrapping a Linux distribution.
+
+## Background
 
 We have learned a lot of lessons about supply chain integrity over the years,
 and the greatest of them may be that any system that is complex to review and
@@ -18,11 +20,11 @@ this, having a central machine somewhere blindly signing all unsigned
 contributions from the public.
 
 We will cover an exhaustive comparison of the supply chain strategies of other
-linux distros elsewhere, but suffice to say while many are pursuing
-reproducible builds, minimalism, or signing... any one distro delivering on all
-of these does not seem in the cards any time soon.
+package management solutions elsewhere, but suffice to say while many are
+pursuing reproducible builds, minimalism, or signing... any one solution
+delivering on all of these does not seem in the cards any time soon.
 
-This is generally a human problem. Most distros end up generating a lot of
+This is generally a human problem. Most solutions end up generating a lot of
 custom tooling for package management, which in turn rapidly grows in
 complexity to meet demands ranging from hobby desktop systems production
 servers.
@@ -32,49 +34,10 @@ lowering the barrier to entry to allow any hobbyist to contribute and maintain
 packages with minimal friction and rarely a requirement of signing keys or
 mandatory reproducible builds, let alone multiple signed reproduction proofs.
 
-Suffice to say, we feel every current Linux distribution has single points of
-human failure, or review complexity, that makes it undesirable for threat
-models that assume any single human can be hacked or coerced.
-
-## Building
-
-### Requirements
-
-* An OCI building runtime
-    * Currently Docker supported, but will support buildah and podman
-* Gnu Make
-
-### Examples
-
-#### Compile all packages
-
-```
-make
-```
-
-#### Compile specific package
-
-```
-make out/rust.tgz
-```
-
-#### Reproduce all changed packages
-
-```
-make reproduce
-```
-
-#### Reproduce all packages without cache
-
-```
-make clean reproduce
-```
-
-#### Sign current manifest of package hashes
-
-```
-make sign
-```
+Suffice to say, we feel every current Linux package management solution and
+container supply chain has single points of human failure, or review
+complexity, that makes it undesirable for threat models that assume any single
+human can be hacked or coerced.
 
 ## Goals
 
@@ -117,3 +80,48 @@ the future.
     * Make (for dependency management)
     * Prove hashes of bootstrap layer builds match before proceeding
 * Keep package definitions lean and readable with simple CLI and no magic
+
+## Building
+
+### Requirements
+
+* An OCI building runtime
+    * Currently Docker supported, but will support buildah and podman
+* Gnu Make
+
+### Examples
+
+#### Compile all packages
+
+```
+make
+```
+
+#### Compile specific package
+
+```
+make out/rust.tgz
+```
+
+#### Reproduce all changed packages
+
+```
+make reproduce
+```
+
+#### Reproduce all packages without cache
+
+```
+make clean reproduce
+```
+
+#### Sign current manifest of package hashes
+
+```
+make sign
+```
+
+## Sponsors
+
+- Turnkey
+- Mysten Labs
