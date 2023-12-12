@@ -31,7 +31,7 @@ RUN make DESTDIR=/home/user/rootfs install
 COPY --from=musl /usr/lib/libc.so /home/user/rootfs/lib/ld-musl-x86_64.so.1
 COPY --from=perl . /home/user/rootfs/
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 ENTRYPOINT ["/usr/bin/automake"]
 CMD ["--version"]

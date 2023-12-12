@@ -25,5 +25,5 @@ RUN set -eux; \
     make;
 RUN make DESTDIR=/home/user/rootfs install
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /

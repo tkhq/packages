@@ -1,12 +1,12 @@
 ARG REGISTRY=local
-FROM ${REGISTRY}/busybox:latest as busybox
-FROM ${REGISTRY}/gcc:latest as gcc
-FROM ${REGISTRY}/binutils:latest as binutils
-FROM ${REGISTRY}/musl:latest as musl
-FROM ${REGISTRY}/make:latest as make
-FROM ${REGISTRY}/autoconf:latest as autoconf
-FROM ${REGISTRY}/automake:latest as automake
-FROM ${REGISTRY}/libtool:latest as libtool
+FROM ${REGISTRY}/busybox as busybox
+FROM ${REGISTRY}/gcc as gcc
+FROM ${REGISTRY}/binutils as binutils
+FROM ${REGISTRY}/musl as musl
+FROM ${REGISTRY}/make as make
+FROM ${REGISTRY}/autoconf as autoconf
+FROM ${REGISTRY}/automake as automake
+FROM ${REGISTRY}/libtool as libtool
 
 FROM busybox as build
 ENV SRC_SITE=https://github.com/libunwind/libunwind/releases/download
@@ -17,13 +17,12 @@ RUN echo "${SRC_HASH}  libunwind-${SRC_VERSION}.tar.gz" | sha256sum -c
 RUN tar -xf libunwind-${SRC_VERSION}.tar.gz
 WORKDIR libunwind-${SRC_VERSION}
 COPY --from=gcc . /
-COPY --from=binutils . /
 COPY --from=make . /
 COPY --from=musl . /
+COPY --from=binutils . /
 COPY --from=autoconf . /
 COPY --from=automake . /
 COPY --from=libtool . /
-#LDFLAGS="-lucontext" CFLAGS="-fno-stack-protector" \
 RUN set -eux; \
     ./configure \
         --build=x86_64-unknown-linux-musl \
@@ -34,9 +33,9 @@ RUN set -eux; \
         --localstatedir=/usr/share/man \
         --enable-cxx-exceptions \
         --disable-tests \
-        --infodir=/usr/share/info; \
+        --infodir=/usr/share/info || cat config.log; \
     make;
 RUN make DESTDIR=/home/user/rootfs install
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /

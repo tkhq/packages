@@ -1,267 +1,324 @@
-export SOURCE_DATE_EPOCH = 0
 export REGISTRY := local
+export PLATFORM := linux/amd64
 export BUILDER := $(shell which docker)
+export SOURCE_DATE_EPOCH = 0
+clean_logs := $(shell rm *.log 2>&1 >/dev/null || :)
 
-define build
-	${BUILDER} \
-		build \
-		-t $(REGISTRY)/$(1):$(2) \
-		--build-arg REGISTRY=$(REGISTRY) \
-		--target $(3) \
-		--output type=oci,dest=$@ \
-		$(1)
-endef
+DEFAULT_GOAL := default
+.PHONY: default
+default: all
+.PHONY: all
+all: \
+	bootstrap.tgz \
+	gcc.tgz \
+	busybox.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz \
+	bash.tgz \
+	zlib.tgz \
+	perl.tgz \
+	linux-headers.tgz \
+	openssl.tgz \
+	python.tgz \
+	py-setuptools.tgz \
+	ca-certificates.tgz \
+	curl.tgz \
+	m4.tgz \
+	autoconf.tgz \
+	automake.tgz \
+	sed.tgz \
+	libtool.tgz \
+	libunwind.tgz \
+	ninja.tgz \
+	cmake.tgz \
+	libxml2 \
+	llvm13.tgz \
+	rust1.54.tgz \
+	llvm.tgz \
+	rust1.55.tgz
 
-out/bootstrap.oci.tgz:
+bootstrap.tgz:
 	$(call build,bootstrap)
 
-out/musl.oci.tgz: \
-	out/bootstrap.oci.tgz
+musl.tgz: bootstrap.tgz
 	$(call build,musl)
 
-out/busybox.oci.tgz: \
-	out/bootstrap.oci.tgz
+busybox.tgz: bootstrap.tgz
 	$(call build,busybox)
 
-out/binutils.oci.tgz: \
-	out/bootstrap.oci.tgz \
-	out/musl.oci.tgz
+binutils.tgz: bootstrap.tgz
 	$(call build,binutils)
 
-out/linux-headers.oci.tgz:
-	$(call build,linux-headers)
-
-out/gcc.oci.tgz: \
-	out/bootstrap.oci.tgz \
-	out/musl.oci.tgz
+gcc.tgz: \
+	bootstrap.tgz \
+	musl.tgz
 	$(call build,gcc)
 
-out/make.oci.tgz: \
-	out/bootstrap.oci.tgz \
-	out/musl.oci.tgz
+make.tgz: bootstrap.tgz
 	$(call build,make)
 
-out/ca-certificates.oci.tgz:
+ca-certificates.tgz:
 	$(call build,ca-certificates)
 
-out/bash.oci.tgz: \
-	out/gcc.oci.tgz
+bash.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz
 	$(call build,bash)
 
-out/m4.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz
+m4.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz
 	$(call build,m4)
 
-out/autoconf.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz \
-	out/perl.oci.tgz \
-	out/m4.oci.tgz
-	$(call build,autoconf)
-
-out/automake.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz \
-	out/perl.oci.tgz \
-	out/autoconf.oci.tgz \
-	out/m4.oci.tgz
-	$(call build,automake)
-
-out/sed.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz
-	$(call build,sed)
-
-out/libtool.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz \
-	out/bash.oci.tgz \
-	out/sed.oci.tgz \
-	out/m4.oci.tgz
-	$(call build,libtool)
-
-out/pkgconf.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz \
-	out/libtool.oci.tgz
-	$(call build,pkgconf)
-
-out/libxml2.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz \
-	out/bash.oci.tgz \
-	out/python.oci.tgz \
-	out/sed.oci.tgz \
-	out/m4.oci.tgz \
-	out/autoconf.oci.tgz \
-	out/automake.oci.tgz \
-	out/pkgconf.oci.tgz \
-	out/libtool.oci.tgz
-	$(call build,libxml2)
-
-out/libunwind.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz \
-	out/bash.oci.tgz \
-	out/autoconf.oci.tgz \
-	out/automake.oci.tgz \
-	out/libtool.oci.tgz
-	$(call build,libunwind)
-
-out/openssl.oci.tgz: \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/busybox.oci.tgz \
-	out/linux-headers.oci.tgz \
-	out/musl.oci.tgz
-	$(call build,openssl)
-
-out/go.oci.tgz: \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/busybox.oci.tgz \
-	out/bash.oci.tgz \
-	out/musl.oci.tgz
-	$(call build,go)
-
-out/perl.oci.tgz: \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/busybox.oci.tgz \
-	out/make.oci.tgz \
-	out/musl.oci.tgz
+perl.tgz: \
+	gcc.tgz \
+	binutils.tgz \
+	busybox.tgz \
+	make.tgz \
+	musl.tgz
 	$(call build,perl)
 
-out/curl.oci.tgz: \
-	out/gcc.oci.tgz \
-	out/musl.oci.tgz \
-	out/busybox.oci.tgz \
-	out/make.oci.tgz \
-	out/binutils.oci.tgz \
-	out/openssl.oci.tgz \
-	out/ca-certificates.oci.tgz
+autoconf.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz \
+	perl.tgz \
+	m4.tgz
+	$(call build,autoconf,,fetch)
+	$(call build,autoconf)
+
+automake.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz \
+	perl.tgz \
+	autoconf.tgz \
+	m4.tgz
+	$(call build,automake)
+
+sed.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz
+	$(call build,sed)
+
+libtool.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz \
+	bash.tgz \
+	sed.tgz \
+	m4.tgz
+	$(call build,libtool)
+
+pkgconf.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz \
+	libtool.tgz
+	$(call build,pkgconf)
+
+libxml2.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz \
+	bash.tgz \
+	python.tgz \
+	sed.tgz \
+	m4.tgz \
+	autoconf.tgz \
+	automake.tgz \
+	pkgconf.tgz \
+	libtool.tgz
+	$(call build,libxml2)
+
+libunwind.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz \
+	bash.tgz \
+	autoconf.tgz \
+	automake.tgz \
+	libtool.tgz
+	$(call build,libunwind)
+
+linux-headers.tgz:
+	$(call build,linux-headers)
+
+openssl.tgz: \
+	gcc.tgz \
+	binutils.tgz \
+	busybox.tgz \
+	linux-headers.tgz \
+	musl.tgz
+	$(call build,openssl)
+
+go.tgz: \
+	gcc.tgz \
+	binutils.tgz \
+	busybox.tgz \
+	bash.tgz \
+	musl.tgz
+	$(call build,go)
+
+curl.tgz: \
+	gcc.tgz \
+	musl.tgz \
+	busybox.tgz \
+	make.tgz \
+	binutils.tgz \
+	openssl.tgz \
+	ca-certificates.tgz
 	$(call build,curl)
 
-out/python.oci.tgz: \
-	out/gcc.oci.tgz \
-	out/perl.oci.tgz \
-	out/binutils.oci.tgz \
-	out/busybox.oci.tgz \
-	out/openssl.oci.tgz \
-	out/make.oci.tgz \
-	out/musl.oci.tgz
+python.tgz: \
+	gcc.tgz \
+	perl.tgz \
+	binutils.tgz \
+	busybox.tgz \
+	openssl.tgz \
+	make.tgz \
+	musl.tgz
 	$(call build,python)
 
-out/ninja.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz \
-	out/openssl.oci.tgz \
-	out/python.oci.tgz
+ninja.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz \
+	openssl.tgz \
+	python.tgz
 	$(call build,ninja)
 
-out/cmake.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/ninja.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz \
-	out/linux-headers.oci.tgz
+cmake.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	ninja.tgz \
+	musl.tgz \
+	make.tgz \
+	linux-headers.tgz
 	$(call build,cmake)
 
-out/py-setuptools.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/python.oci.tgz
+py-setuptools.tgz: \
+	busybox.tgz \
+	python.tgz
 	$(call build,py-setuptools)
 
-out/zlib.oci.tgz: \
-	out/busybox.oci.tgz \
-	out/gcc.oci.tgz \
-	out/binutils.oci.tgz \
-	out/musl.oci.tgz \
-	out/make.oci.tgz
+zlib.tgz: \
+	busybox.tgz \
+	gcc.tgz \
+	binutils.tgz \
+	musl.tgz \
+	make.tgz
 	$(call build,zlib)
 
-out/llvm.oci.tgz: \
-	out/gcc.oci.tgz \
-	out/python.oci.tgz \
-	out/py-setuptools.oci.tgz \
-	out/perl.oci.tgz \
-	out/binutils.oci.tgz \
-	out/cmake.oci.tgz \
-	out/ninja.oci.tgz \
-	out/busybox.oci.tgz \
-	out/musl.oci.tgz
+llvm13.tgz: \
+	gcc.tgz \
+	python.tgz \
+	py-setuptools.tgz \
+	perl.tgz \
+	binutils.tgz \
+	cmake.tgz \
+	ninja.tgz \
+	busybox.tgz \
+	musl.tgz
+	$(call build,llvm,13.0.1)
+
+llvm.tgz: \
+	gcc.tgz \
+	python.tgz \
+	py-setuptools.tgz \
+	perl.tgz \
+	binutils.tgz \
+	cmake.tgz \
+	ninja.tgz \
+	busybox.tgz \
+	musl.tgz
 	$(call build,llvm)
 
-out/llvm13.oci.tgz: \
-	out/gcc.oci.tgz \
-	out/python.oci.tgz \
-	out/py-setuptools.oci.tgz \
-	out/perl.oci.tgz \
-	out/binutils.oci.tgz \
-	out/cmake.oci.tgz \
-	out/ninja.oci.tgz \
-	out/busybox.oci.tgz \
-	out/musl.oci.tgz
-	$(call build,llvm13)
+rust1.54.tgz: \
+	gcc.tgz \
+	bash.tgz \
+	zlib.tgz \
+	python.tgz \
+	py-setuptools.tgz \
+	curl.tgz \
+	perl.tgz \
+	libunwind.tgz \
+	llvm13.tgz \
+	binutils.tgz \
+	cmake.tgz \
+	make.tgz \
+	busybox.tgz \
+	musl.tgz
+	$(call build,rust,1.54.0,bootstrap-package)
 
-out/rust1.54.oci.tgz: \
-	out/gcc.oci.tgz \
-	out/bash.oci.tgz \
-	out/zlib.oci.tgz \
-	out/python.oci.tgz \
-	out/py-setuptools.oci.tgz \
-	out/curl.oci.tgz \
-	out/perl.oci.tgz \
-	out/libunwind.oci.tgz \
-	out/llvm13.oci.tgz \
-	out/binutils.oci.tgz \
-	out/cmake.oci.tgz \
-	out/make.oci.tgz \
-	out/busybox.oci.tgz \
-	out/musl.oci.tgz
-	$(call build,rust,1.54.0,bootstrap)
+rust1.55.tgz: rust1.54.tgz
+	$(call build,rust,1.55.0,package,--build-arg BUILD_VERSION=1.54.0)
 
-out/rust1.55.oci.tgz: out/rust1.54.oci.tgz
-	$(call build,rust,1.55.0)
-
-test:
-	docker build -t $(REGISTRY)/test-c tests/c
-	docker build -t $(REGISTRY)/test-go tests/go
-	docker build -t $(REGISTRY)/test-perl tests/perl
-	@printf "\nOcirep Test Suite\n"
-	@printf "go -> "
-	@docker run -i $(REGISTRY)/test-go | grep Success
-	@printf "c -> "
-	@docker run -i $(REGISTRY)/test-c | grep Success
-	@printf "perl -> "
-	@docker run -i $(REGISTRY)/test-perl | grep Success
+# Build package with chosen $(BUILDER)
+# Supported BUILDERs: docker
+# Usage: $(call build,$(NAME),$(VERSION),$(TARGET),$(EXTRA_ARGS))
+# Notes:
+# - Packages are expected to use the following layer names in order:
+#   - "fetch": [optional] obtain any artifacts from the internet.
+#   - "build": [optional] do any required build work
+#   - "package": [required] scratch layer exporting artifacts for distribution
+#   - "test": [optional] define any tests
+# - Packages may prefix layer names with "text-" if more than one is desired
+# - VERSION will be set as a build-arg if defined, otherwise it is "latest"
+# - TARGET defaults to "package"
+# - EXTRA_ARGS will be blindly injected
+# - packages may also define a "test" layer
+#  TODO:
+# - try to disable networking on fetch layers with something like:
+#   $(if $(filter fetch,$(lastword $(subst -, ,$(TARGET)))),,--network=none)
+# - actually output OCI files for each build (vs plain tar)
+# - output manifest.txt of all tar/digest hashes for an easy git diff
+# - support buildah and podman
+define build
+	$(eval NAME := $(1))
+	$(eval VERSION := $(if $(2),$(2),latest))
+	$(eval TARGET := $(if $(3),$(3),package))
+	$(eval EXTRA_ARGS := $(if $(4),$(4),))
+	$(eval BUILD_CMD := \
+		SOURCE_DATE_EPOCH=1 \
+		$(BUILDER) \
+			build \
+			-t $(REGISTRY)/$(NAME):$(VERSION) \
+			--build-arg REGISTRY=$(REGISTRY) \
+			--platform $(PLATFORM) \
+			--progress=plain \
+			$(if $(filter latest,$(VERSION)),,--build-arg VERSION=$(VERSION)) \
+			--target $(TARGET) \
+			$(EXTRA_ARGS) \
+			$(NAME) \
+	)
+	$(eval TIMESTAMP := $(shell TZ=GMT date +"%Y-%m-%dT%H:%M:%SZ"))
+	echo $(TIMESTAMP) $(BUILD_CMD) >> build.log
+	$(BUILD_CMD)
+	$(if $(filter package,$(TARGET)),$(BUILDER) save $(REGISTRY)/$(NAME):$(VERSION),)
+endef

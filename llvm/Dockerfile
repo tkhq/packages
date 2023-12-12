@@ -1,23 +1,24 @@
 ARG REGISTRY=local
-FROM ${REGISTRY}/busybox:latest as busybox
-FROM ${REGISTRY}/gcc:latest as gcc
-FROM ${REGISTRY}/binutils:latest as binutils
-FROM ${REGISTRY}/musl:latest as musl
-FROM ${REGISTRY}/openssl:latest as openssl
-FROM ${REGISTRY}/python:latest as python
-FROM ${REGISTRY}/py-setuptools:latest as py-setuptools
-FROM ${REGISTRY}/cmake:latest as cmake
-FROM ${REGISTRY}/ninja:latest as ninja
+FROM ${REGISTRY}/busybox as busybox
+FROM ${REGISTRY}/gcc as gcc
+FROM ${REGISTRY}/binutils as binutils
+FROM ${REGISTRY}/musl as musl
+FROM ${REGISTRY}/openssl as openssl
+FROM ${REGISTRY}/python as python
+FROM ${REGISTRY}/py-setuptools as py-setuptools
+FROM ${REGISTRY}/cmake as cmake
+FROM ${REGISTRY}/ninja as ninja
 
 FROM busybox as build
+ARG VERSION=16.0.6
+ENV SRC_VERSION=${VERSION}
 ENV SRC_SITE=https://github.com/llvm/llvm-project/releases/download
-ENV SRC_VERSION=16.0.6
-ENV SRC_HASH=ce5e71081d17ce9e86d7cbcfa28c4b04b9300f8fb7e78422b1feb6bc52c3028e
+ENV SRC_HASH_13_0_1=326335a830f2e32d06d0a36393b5455d17dc73e0bd1211065227ee014f92cbf8
+ENV SRC_HASH_16_0_6=ce5e71081d17ce9e86d7cbcfa28c4b04b9300f8fb7e78422b1feb6bc52c3028e
 RUN wget ${SRC_SITE}/llvmorg-${SRC_VERSION}/llvm-project-${SRC_VERSION}.src.tar.xz
-RUN echo "${SRC_HASH}  llvm-project-${SRC_VERSION}.src.tar.xz" | sha256sum -c
+RUN echo "$(printenv SRC_HASH_${VERSION//./_})  llvm-project-${SRC_VERSION}.src.tar.xz" | sha256sum -c
 RUN tar -xf llvm-project-${SRC_VERSION}.src.tar.xz
 WORKDIR llvm-project-${SRC_VERSION}.src
-RUN ls -lah .
 ADD . .
 RUN patch -p1 < rust-feature-tables.patch
 COPY --from=binutils . /
@@ -49,7 +50,7 @@ RUN set -eux; \
 		-DLLVM_ENABLE_ASSERTIONS=OFF \
 		-DLLVM_ENABLE_DUMP=ON \
 		-DLLVM_ENABLE_EH=ON \
-		-DLLVM_ENABLE_FFI=ON \
+		-DLLVM_ENABLE_FFI=OFF \
 		-DLLVM_ENABLE_LIBCXX=OFF \
 		-DLLVM_ENABLE_LIBEDIT=OFF \
 		-DLLVM_ENABLE_PIC=ON \
@@ -75,7 +76,7 @@ COPY --from=musl /lib/* /home/user/rootfs/lib/
 COPY --from=gcc /usr/lib/* /home/user/rootfs/usr/lib/
 COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 USER 100:100
 ENTRYPOINT ["/usr/bin/llc"]

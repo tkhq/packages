@@ -16,5 +16,5 @@ RUN set -eux; \
     python3 setup.py install --root=/home/user/rootfs; \
     ls -Rlah /home/user/rootfs
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /

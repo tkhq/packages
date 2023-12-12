@@ -23,7 +23,7 @@ RUN set -ex; \
 	make DESTDIR="/rootfs" install;
 COPY --from=musl /usr/lib/libc.so /rootfs/lib/ld-musl-x86_64.so.1
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /rootfs /
 ENTRYPOINT ["/usr/bin/make"]
 CMD ["--version"]

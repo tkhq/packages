@@ -39,7 +39,7 @@ COPY --from=musl . /home/user/rootfs/
 COPY --from=openssl . /home/user/rootfs/
 COPY --from=ca-certificates . /home/user/rootfs/
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 USER 100:100
 ENTRYPOINT ["/usr/bin/curl"]

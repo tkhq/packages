@@ -43,7 +43,7 @@ COPY --from=gcc /usr/lib/* /home/user/rootfs/usr/lib/
 COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
 COPY --from=openssl /usr/lib/* /home/user/rootfs/usr/lib/
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 USER 100:100
 ENTRYPOINT ["/usr/bin/cmake"]

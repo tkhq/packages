@@ -85,7 +85,7 @@ RUN set -eux; \
     mkdir -p ${DEST}; \
     cp -R bin lib pkg src ${DEST}
 
-FROM scratch
+FROM scratch as package
 COPY --from=stage3 /home/user/go-stage3 /
 USER 100:100
 ENTRYPOINT ["/bin/go"]

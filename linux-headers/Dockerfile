@@ -17,5 +17,5 @@ RUN set -ex; \
     find /rootfs/usr/include/ ! -iname "*.h" -type f -exec rm -v {} \+; \
     rm -rf /rootfs/usr/include/drm;
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /rootfs /

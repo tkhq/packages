@@ -44,5 +44,5 @@ RUN set -eux; \
 RUN make DESTDIR=/home/user/rootfs install
 RUN ls -Rlah /home/user/rootfs
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /

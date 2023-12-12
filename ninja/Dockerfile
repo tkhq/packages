@@ -35,7 +35,7 @@ RUN set -eux; \
 COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
 COPY --from=musl . /home/user/rootfs/
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 USER 100:100
 ENTRYPOINT ["/usr/bin/ninja"]

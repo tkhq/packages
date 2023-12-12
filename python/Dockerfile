@@ -35,7 +35,7 @@ RUN set -eux; \
 RUN ln -s /usr/bin/python3 /home/user/rootfs/usr/bin/python
 COPY --from=musl . /home/user/rootfs/
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 USER 100:100
 ENTRYPOINT ["/usr/bin/python"]

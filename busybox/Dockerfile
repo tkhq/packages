@@ -1,14 +1,18 @@
 ARG REGISTRY=local
-FROM ${REGISTRY}/bootstrap as bootstrap
+FROM ${REGISTRY}/bootstrap as base
+ENV SRC_SITE=https://busybox.net/downloads
+ENV SRC_VERSION=1.35.0
+ENV SRC_HASH=faeeb244c35a348a334f4a59e44626ee870fb07b6884d68c10ae8bc19f83a694
+ENV SRC_FILE=busybox-${SRC_VERSION}.tar.bz2
 
-FROM bootstrap as build
-ENV SOURCE_SITE=https://busybox.net/downloads
-ENV SOURCE_VERSION=1.35.0
-ENV SOURCE_HASH=faeeb244c35a348a334f4a59e44626ee870fb07b6884d68c10ae8bc19f83a694
-RUN wget ${SOURCE_SITE}/busybox-${SOURCE_VERSION}.tar.bz2
-RUN echo "${SOURCE_HASH} busybox-${SOURCE_VERSION}.tar.bz2" | sha256sum -c
-RUN tar -xjf busybox-${SOURCE_VERSION}.tar.bz2
-WORKDIR busybox-${SOURCE_VERSION}
+FROM base as fetch
+RUN set -eux; \
+    wget ${SRC_SITE}/${SRC_FILE}; \
+    echo "${SRC_HASH}  ${SRC_FILE}" | sha256sum -c
+
+FROM fetch as build
+RUN tar -xjf ${SRC_FILE}
+WORKDIR busybox-${SRC_VERSION}
 RUN set -eux; \
 	setConfs=' \
 		CONFIG_AR=y \
@@ -51,7 +55,7 @@ RUN set -eux; \
 RUN make
 RUN cp busybox /
 
-FROM scratch
+FROM scratch as package
 COPY --from=build busybox /
 RUN ["/busybox","mkdir","/bin"]
 RUN ["/busybox","--install","-s","/bin"]
@@ -63,3 +67,7 @@ RUN chown -R 1000:1000 /home/user /tmp /var/tmp
 WORKDIR /home/user
 USER 1000:1000
 ENTRYPOINT ["/bin/sh"]
+ENV TZ=UTC
+ENV LANG=C.UTF-8
+ENV SOURCE_DATE_EPOCH=1
+ENV PS1=busybox

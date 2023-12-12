@@ -38,5 +38,5 @@ RUN set -eux; \
     ln -sf ld-musl-x86_64.so.1 /home/user/rootfs/lib/libc.musl-x86_64.so.1; \
     ln -sf ../../lib/ld-musl-x86_64.so.1 /home/user/rootfs/usr/lib/libc.so;
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /

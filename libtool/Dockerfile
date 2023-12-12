@@ -29,9 +29,9 @@ RUN make DESTDIR=/home/user/rootfs install
 COPY --from=musl /usr/lib/libc.so /home/user/rootfs/lib/ld-musl-x86_64.so.1
 COPY --from=bash . /home/user/rootfs
 COPY --from=sed . /home/user/rootfs
-RUN ln -s /usr/bin/bash /home/user/rootfs/bin/sh
+RUN ln -s /bin/bash /home/user/rootfs/bin/sh
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 ENTRYPOINT ["/usr/bin/libtool"]
 CMD ["--version"]

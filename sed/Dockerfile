@@ -1,4 +1,4 @@
-REGISTRY=local
+ARG REGISTRY=local
 FROM ${REGISTRY}/busybox:latest as busybox
 FROM ${REGISTRY}/gcc:latest as gcc
 FROM ${REGISTRY}/binutils:latest as binutils
@@ -25,7 +25,7 @@ RUN set -eux; \
 RUN make DESTDIR=/home/user/rootfs install
 COPY --from=musl /usr/lib/libc.so /home/user/rootfs/lib/ld-musl-x86_64.so.1
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 ENTRYPOINT ["/bin/sed"]
 CMD ["--version"]

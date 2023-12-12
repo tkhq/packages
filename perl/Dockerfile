@@ -49,7 +49,7 @@ RUN set -eux; \
     make DESTDIR=/home/user/rootfs install
 COPY --from=musl /usr/lib/libc.so /home/user/rootfs/lib/ld-musl-x86_64.so.1
 
-FROM scratch
+FROM scratch as package
 COPY --from=build /home/user/rootfs /
 USER 100:100
 ENTRYPOINT ["/usr/bin/perl"]
