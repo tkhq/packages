@@ -70,4 +70,4 @@ ENTRYPOINT ["/bin/sh"]
 ENV TZ=UTC
 ENV LANG=C.UTF-8
 ENV SOURCE_DATE_EPOCH=1
-ENV PS1=busybox
+ENV PS1="busybox$ "
