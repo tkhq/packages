@@ -268,6 +268,7 @@ rust1.54.tgz: \
 	curl.tgz \
 	perl.tgz \
 	libunwind.tgz \
+	pkgconf.tgz \
 	llvm13.tgz \
 	binutils.tgz \
 	cmake.tgz \
@@ -278,6 +279,63 @@ rust1.54.tgz: \
 
 rust1.55.tgz: rust1.54.tgz
 	$(call build,rust,1.55.0,package,--build-arg BUILD_VERSION=1.54.0)
+
+rust1.56.tgz: rust1.55.tgz
+	$(call build,rust,1.56.0,package,--build-arg BUILD_VERSION=1.55.0)
+
+rust1.57.tgz: rust1.56.tgz
+	$(call build,rust,1.57.0,package,--build-arg BUILD_VERSION=1.56.0)
+
+rust1.58.tgz: rust1.57.tgz
+	$(call build,rust,1.58.0,package,--build-arg BUILD_VERSION=1.57.0)
+
+rust1.59.tgz: rust1.58.tgz
+	$(call build,rust,1.59.0,package,--build-arg BUILD_VERSION=1.58.0)
+
+rust1.60.tgz: rust1.59.tgz
+	$(call build,rust,1.60.0,package,--build-arg BUILD_VERSION=1.59.0)
+
+rust1.61.tgz: rust1.60.tgz
+	$(call build,rust,1.61.0,package,--build-arg BUILD_VERSION=1.60.0)
+
+rust1.62.tgz: rust1.61.tgz
+	$(call build,rust,1.62.0,package,--build-arg BUILD_VERSION=1.61.0)
+
+rust1.63.tgz: rust1.62.tgz
+	$(call build,rust,1.63.0,package,--build-arg BUILD_VERSION=1.62.0)
+
+rust1.64.tgz: rust1.63.tgz
+	$(call build,rust,1.64.0,package,--build-arg BUILD_VERSION=1.63.0)
+
+rust1.65.tgz: rust1.64.tgz
+	$(call build,rust,1.65.0,package,--build-arg BUILD_VERSION=1.64.0)
+
+rust1.66.tgz: rust1.65.tgz
+	$(call build,rust,1.66.0,package,--build-arg BUILD_VERSION=1.65.0)
+
+rust1.67.tgz: rust1.66.tgz
+	$(call build,rust,1.67.0,package,--build-arg BUILD_VERSION=1.66.0)
+
+rust1.68.tgz: rust1.67.tgz
+	$(call build,rust,1.68.0,package,--build-arg BUILD_VERSION=1.67.0)
+
+rust1.69.tgz: rust1.68.tgz
+	$(call build,rust,1.69.0,package,--build-arg BUILD_VERSION=1.68.0)
+
+rust1.70.tgz: rust1.69.tgz
+	$(call build,rust,1.70.0,package,--build-arg BUILD_VERSION=1.69.0)
+
+rust1.71.tgz: rust1.70.tgz
+	$(call build,rust,1.71.0,package,--build-arg BUILD_VERSION=1.70.0)
+
+rust1.72.tgz: rust1.71.tgz
+	$(call build,rust,1.72.0,package,--build-arg BUILD_VERSION=1.71.0)
+
+rust1.73.tgz: rust1.72.tgz
+	$(call build,rust,1.73.0,package,--build-arg BUILD_VERSION=1.72.0)
+
+rust1.74.tgz: rust1.73.tgz
+	$(call build,rust,1.74.0,package,--build-arg BUILD_VERSION=1.73.0)
 
 # Build package with chosen $(BUILDER)
 # Supported BUILDERs: docker
