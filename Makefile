@@ -305,6 +305,7 @@ define build
 	$(eval TARGET := $(if $(3),$(3),package))
 	$(eval EXTRA_ARGS := $(if $(4),$(4),))
 	$(eval BUILD_CMD := \
+		DOCKER_BUILDKIT=1 \
 		SOURCE_DATE_EPOCH=1 \
 		$(BUILDER) \
 			build \
@@ -320,5 +321,5 @@ define build
 	$(eval TIMESTAMP := $(shell TZ=GMT date +"%Y-%m-%dT%H:%M:%SZ"))
 	echo $(TIMESTAMP) $(BUILD_CMD) >> build.log
 	$(BUILD_CMD)
-	$(if $(filter package,$(TARGET)),$(BUILDER) save $(REGISTRY)/$(NAME):$(VERSION),)
+	$(if $(filter package,$(TARGET)),$(BUILDER) save $(REGISTRY)/$(NAME):$(VERSION) -o $@,)
 endef
