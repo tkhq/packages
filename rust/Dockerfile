@@ -15,6 +15,7 @@ FROM ${REGISTRY}/python as python
 FROM ${REGISTRY}/py-setuptools as py-setuptools
 FROM ${REGISTRY}/zlib as zlib
 FROM ${REGISTRY}/openssl as openssl
+FROM ${REGISTRY}/pkgconf as pkgconf
 FROM ${REGISTRY}/llvm:${LLVM_VERSION} as llvm
 
 FROM ${REGISTRY}/busybox as base
@@ -59,6 +60,7 @@ COPY --from=cmake . /
 COPY --from=python . /
 COPY --from=py-setuptools . /
 COPY --from=zlib . /
+COPY --from=pkgconf . /
 COPY --from=openssl . /
 COPY --from=llvm . /
 COPY --from=perl . /
@@ -126,7 +128,6 @@ RUN echo "$(printenv SRC_HASH_${VERSION//./_})  rustc-${VERSION}-src.tar.gz" | s
 FROM ${REGISTRY}/rust:${BUILD_VERSION} as rust
 FROM fetch as build
 RUN tar -xzf rustc-${VERSION}-src.tar.gz
-RUN ls -lah
 WORKDIR rustc-${VERSION}-src
 COPY --from=rust . /
 RUN set -eux; \
@@ -138,6 +139,7 @@ RUN set -eux; \
         --release-channel="stable" \
         --enable-local-rust \
         --local-rust-root="/usr" \
+        --sysconfdir="/home/user/rootfs/etc" \
         --llvm-root="/usr/lib/llvm${LLVM_VERSION}" \
         --disable-docs \
         --tools="cargo" \
@@ -148,6 +150,7 @@ RUN set -eux; \
         --dist-compression-formats=gz \
         --python="python3" \
         --set="install.prefix=/home/user/rootfs/usr" \
+        --set="build.extended=true" \
         --set="rust.musl-root=/usr" \
         --set="rust.backtrace-on-ice=true" \
         --set="rust.codegen-units=1" \
@@ -169,7 +172,6 @@ COPY --from=musl /lib/* /home/user/rootfs/lib/
 COPY --from=gcc /usr/lib/* /home/user/rootfs/usr/lib/
 COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
 COPY --from=llvm /usr/lib/* /home/user/rootfs/usr/lib/
-RUN ls -Rlah /home/user/rootfs
 
 FROM scratch as package
 USER 100:100
