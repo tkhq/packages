@@ -243,6 +243,7 @@ llvm13.tgz: \
 	binutils.tgz \
 	cmake.tgz \
 	ninja.tgz \
+	curl.tgz \
 	busybox.tgz \
 	musl.tgz
 	$(call build,llvm,13.0.1)
@@ -255,9 +256,12 @@ llvm.tgz: \
 	binutils.tgz \
 	cmake.tgz \
 	ninja.tgz \
+	curl.tgz \
 	busybox.tgz \
 	musl.tgz
 	$(call build,llvm)
+	$(BUILDER) tag $(REGISTRY)/llvm $(REGISTRY)/llvm:16
+	$(BUILDER) tag $(REGISTRY)/llvm $(REGISTRY)/llvm:16.0.6
 
 rust1.54.tgz: \
 	gcc.tgz \
@@ -319,23 +323,23 @@ rust1.67.tgz: rust1.66.tgz
 rust1.68.tgz: rust1.67.tgz
 	$(call build,rust,1.68.0,package,--build-arg BUILD_VERSION=1.67.0)
 
-rust1.69.tgz: rust1.68.tgz
-	$(call build,rust,1.69.0,package,--build-arg BUILD_VERSION=1.68.0)
+rust1.69.tgz: rust1.68.tgz llvm.tgz
+	$(call build,rust,1.69.0,package,--build-arg BUILD_VERSION=1.68.0 --build-arg LLVM_VERSION=16)
 
 rust1.70.tgz: rust1.69.tgz
-	$(call build,rust,1.70.0,package,--build-arg BUILD_VERSION=1.69.0)
+	$(call build,rust,1.70.0,package,--build-arg BUILD_VERSION=1.69.0 --build-arg LLVM_VERSION=16)
 
 rust1.71.tgz: rust1.70.tgz
-	$(call build,rust,1.71.0,package,--build-arg BUILD_VERSION=1.70.0)
+	$(call build,rust,1.71.0,package,--build-arg BUILD_VERSION=1.70.0 --build-arg LLVM_VERSION=16)
 
 rust1.72.tgz: rust1.71.tgz
-	$(call build,rust,1.72.0,package,--build-arg BUILD_VERSION=1.71.0)
+	$(call build,rust,1.72.0,package,--build-arg BUILD_VERSION=1.71.0 --build-arg LLVM_VERSION=16)
 
 rust1.73.tgz: rust1.72.tgz
-	$(call build,rust,1.73.0,package,--build-arg BUILD_VERSION=1.72.0)
+	$(call build,rust,1.73.0,package,--build-arg BUILD_VERSION=1.72.0 --build-arg LLVM_VERSION=16)
 
 rust1.74.tgz: rust1.73.tgz
-	$(call build,rust,1.74.0,package,--build-arg BUILD_VERSION=1.73.0)
+	$(call build,rust,1.74.0,package,--build-arg BUILD_VERSION=1.73.0 --build-arg LLVM_VERSION=16)
 
 # Build package with chosen $(BUILDER)
 # Supported BUILDERs: docker

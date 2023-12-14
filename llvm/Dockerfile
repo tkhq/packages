@@ -1,5 +1,5 @@
 ARG REGISTRY=local
-FROM ${REGISTRY}/busybox as busybox
+ARG VERSION=16.0.6
 FROM ${REGISTRY}/gcc as gcc
 FROM ${REGISTRY}/binutils as binutils
 FROM ${REGISTRY}/musl as musl
@@ -8,19 +8,14 @@ FROM ${REGISTRY}/python as python
 FROM ${REGISTRY}/py-setuptools as py-setuptools
 FROM ${REGISTRY}/cmake as cmake
 FROM ${REGISTRY}/ninja as ninja
-
-FROM busybox as build
-ARG VERSION=16.0.6
+FROM ${REGISTRY}/curl as curl
+FROM ${REGISTRY}/busybox as base
+ARG VERSION
+ENV VERSION=${VERSION}
 ENV SRC_VERSION=${VERSION}
 ENV SRC_SITE=https://github.com/llvm/llvm-project/releases/download
 ENV SRC_HASH_13_0_1=326335a830f2e32d06d0a36393b5455d17dc73e0bd1211065227ee014f92cbf8
 ENV SRC_HASH_16_0_6=ce5e71081d17ce9e86d7cbcfa28c4b04b9300f8fb7e78422b1feb6bc52c3028e
-RUN wget ${SRC_SITE}/llvmorg-${SRC_VERSION}/llvm-project-${SRC_VERSION}.src.tar.xz
-RUN echo "$(printenv SRC_HASH_${VERSION//./_})  llvm-project-${SRC_VERSION}.src.tar.xz" | sha256sum -c
-RUN tar -xf llvm-project-${SRC_VERSION}.src.tar.xz
-WORKDIR llvm-project-${SRC_VERSION}.src
-ADD . .
-RUN patch -p1 < rust-feature-tables.patch
 COPY --from=binutils . /
 COPY --from=cmake . /
 COPY --from=ninja . /
@@ -28,7 +23,17 @@ COPY --from=musl . /
 COPY --from=gcc . /
 COPY --from=python . /
 COPY --from=py-setuptools . /
+COPY --from=curl . /
 
+FROM base as fetch
+RUN curl -LOJ ${SRC_SITE}/llvmorg-${SRC_VERSION}/llvm-project-${SRC_VERSION}.src.tar.xz
+RUN echo "$(printenv SRC_HASH_${VERSION//./_})  llvm-project-${SRC_VERSION}.src.tar.xz" | sha256sum -c
+
+FROM fetch as build
+RUN tar -xf llvm-project-${SRC_VERSION}.src.tar.xz
+WORKDIR llvm-project-${SRC_VERSION}.src
+ADD . .
+RUN patch -p1 < rust-feature-tables.patch
 RUN set -eux; \
     python -c "import setuptools; print(setuptools.__version__)"; \
     cmake \
@@ -66,12 +71,10 @@ RUN set -eux; \
 		-DLLVM_USE_PERF=ON; \
 	cmake --build build; \
     python3 llvm/utils/lit/setup.py build
-
 RUN set -eux; \
     export DESTDIR="/home/user/rootfs/"; \
     cmake --install build; \
 	python3 llvm/utils/lit/setup.py install --root="$DESTDIR"
-
 COPY --from=musl /lib/* /home/user/rootfs/lib/
 COPY --from=gcc /usr/lib/* /home/user/rootfs/usr/lib/
 COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
