@@ -1,7 +1,7 @@
 export REGISTRY := local
 export PLATFORM := linux/amd64
 export BUILDER := $(shell which docker)
-export SOURCE_DATE_EPOCH = 0
+export SOURCE_DATE_EPOCH = 1
 clean_logs := $(shell rm *.log 2>&1 >/dev/null || :)
 
 DEFAULT_GOAL := default
@@ -9,34 +9,12 @@ DEFAULT_GOAL := default
 default: all
 .PHONY: all
 all: \
-	bootstrap.tgz \
-	gcc.tgz \
-	busybox.tgz \
-	binutils.tgz \
-	musl.tgz \
-	make.tgz \
-	bash.tgz \
-	zlib.tgz \
-	perl.tgz \
-	linux-headers.tgz \
-	openssl.tgz \
 	python.tgz \
-	py-setuptools.tgz \
-	ca-certificates.tgz \
-	curl.tgz \
-	m4.tgz \
-	autoconf.tgz \
-	automake.tgz \
-	sed.tgz \
-	libtool.tgz \
-	libunwind.tgz \
-	ninja.tgz \
-	cmake.tgz \
-	libxml2 \
-	llvm13.tgz \
-	rust1.54.tgz \
-	llvm.tgz \
-	rust1.55.tgz
+	rust.tgz \
+	go.tgz
+
+graph.svg: Makefile
+	$(MAKE) -Bnd | make2graph | dot -Tsvg -o graph.svg
 
 bootstrap.tgz:
 	$(call build,bootstrap)
@@ -338,7 +316,7 @@ rust1.72.tgz: rust1.71.tgz
 rust1.73.tgz: rust1.72.tgz
 	$(call build,rust,1.73.0,package,--build-arg BUILD_VERSION=1.72.0 --build-arg LLVM_VERSION=16)
 
-rust1.74.tgz: rust1.73.tgz
+rust.tgz: rust1.73.tgz
 	$(call build,rust,1.74.0,package,--build-arg BUILD_VERSION=1.73.0 --build-arg LLVM_VERSION=16)
 
 # Build package with chosen $(BUILDER)
