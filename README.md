@@ -121,7 +121,39 @@ make clean reproduce
 make sign
 ```
 
+## Packaging
+
+Every package should have a minimum of 5 stages as follows
+
+* base
+    * based on busybox or bootstrap
+    * Runs as unprivileged user 1000 (user)
+    * Sets environment to be shared with fetch, build, and install stages
+    * Imports dependencies for fetch, build, and install stages
+* fetch
+    * Based on "base"
+    * Runs as unprivileged user 1000 (user)
+    * Has internet access
+    * Obtains any needed source files from the internet
+    * Verifies sources against hardcoded hashes
+* build
+    * Based on "fetch"
+    * Runs as unprivileged user 1000 (user)
+    * Extract sources
+    * Apply any patches as needed
+    * Build any artifacts as needed
+* install
+    * Based on "build"
+    * Elevates privileges to user 0:0 (root)
+    * Installs all files in /home/user/rootfs owned by root
+    * Sets all timestamps in /home/user/rootfs to @0 (Unix Epoch)
+* package
+    * Based on scratch
+    * Copies /home/user/rootfs from "install" to /
+    * Sets runtime user/perms/env as needed
+
 ## Sponsors
 
 - Turnkey
+- Distrust
 - Mysten Labs

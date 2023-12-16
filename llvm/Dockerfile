@@ -9,7 +9,9 @@ FROM ${REGISTRY}/py-setuptools as py-setuptools
 FROM ${REGISTRY}/cmake as cmake
 FROM ${REGISTRY}/ninja as ninja
 FROM ${REGISTRY}/curl as curl
-FROM ${REGISTRY}/busybox as base
+FROM ${REGISTRY}/busybox as busybox
+
+FROM busybox as base
 ARG VERSION
 ENV VERSION=${VERSION}
 ENV SRC_VERSION=${VERSION}
@@ -70,17 +72,20 @@ RUN set -eux; \
 		-DLLVM_LINK_LLVM_DYLIB=ON \
 		-DLLVM_USE_PERF=ON; \
 	cmake --build build; \
-    python3 llvm/utils/lit/setup.py build
+    python3 llvm/utils/lit/setup.py build;
+
+FROM build as install
+USER 0:0
 RUN set -eux; \
-    export DESTDIR="/home/user/rootfs/"; \
-    cmake --install build; \
-	python3 llvm/utils/lit/setup.py install --root="$DESTDIR"
-COPY --from=musl /lib/* /home/user/rootfs/lib/
-COPY --from=gcc /usr/lib/* /home/user/rootfs/usr/lib/
-COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
+    DESTDIR="/rootfs" cmake --install build; \
+	python3 llvm/utils/lit/setup.py install --root="/rootfs"
+COPY --from=musl /lib/* /rootfs/lib/
+COPY --from=gcc /usr/lib/* /rootfs/usr/lib/
+COPY --from=gcc /usr/lib64/* /rootfs/usr/lib/
+RUN find /rootfs -exec touch -hcd "@0" "{}" +
 
 FROM scratch as package
-COPY --from=build /home/user/rootfs /
+COPY --from=install /rootfs /
 USER 100:100
 ENTRYPOINT ["/usr/bin/llc"]
 CMD ["--version"]

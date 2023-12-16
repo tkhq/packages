@@ -17,8 +17,9 @@ FROM ${REGISTRY}/zlib as zlib
 FROM ${REGISTRY}/openssl as openssl
 FROM ${REGISTRY}/pkgconf as pkgconf
 FROM ${REGISTRY}/llvm:${LLVM_VERSION} as llvm
+FROM ${REGISTRY}/busybox as busybox
 
-FROM ${REGISTRY}/busybox as base
+FROM busybox as base
 ENV BOOTSTRAP_VERSION=1.54.0
 ENV SRC_SITE=https://static.rust-lang.org/dist
 ENV MRUSTC_VERSION=16d744fd62e74a2d4356df864b5850bf782918da
@@ -101,20 +102,20 @@ RUN make -f minicargo.mk LLVM_CONFIG=/usr/bin/llvm-config output/rustc
 RUN make -f minicargo.mk LLVM_CONFIG=/usr/bin/llvm-config output/cargo
 RUN make -C run_rustc LLVM_CONFIG=/usr/bin/llvm-config
 RUN set -eux; \
-    mkdir -p /home/user/rootfs/usr/bin /home/user/rootfs/usr/lib; \
-    cp -R run_rustc/output/prefix/* /home/user/rootfs/; \
-    rm /home/user/rootfs/bin/rustc; \
-    mv /home/user/rootfs/bin/rustc_binary /home/user/rootfs/usr/bin/rustc; \
-    mv /home/user/rootfs/bin/cargo /home/user/rootfs/usr/bin/; \
-    mv /home/user/rootfs/lib/rustlib /home/user/rootfs/usr/lib/rustlib; \
-    mv /home/user/rootfs/usr/lib/rustlib/x86_64-unknown-linux-musl/lib/librustc_driver.so /home/user/rootfs/usr/lib/
-COPY --from=musl /lib/* /home/user/rootfs/lib/
-COPY --from=gcc /usr/lib/* /home/user/rootfs/usr/lib/
-COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
+    mkdir -p /rootfs/usr/bin /rootfs/usr/lib; \
+    cp -R run_rustc/output/prefix/* /rootfs/; \
+    rm /rootfs/bin/rustc; \
+    mv /rootfs/bin/rustc_binary /rootfs/usr/bin/rustc; \
+    mv /rootfs/bin/cargo /rootfs/usr/bin/; \
+    mv /rootfs/lib/rustlib /rootfs/usr/lib/rustlib; \
+    mv /rootfs/usr/lib/rustlib/x86_64-unknown-linux-musl/lib/librustc_driver.so /rootfs/usr/lib/
+COPY --from=musl /lib/* /rootfs/lib/
+COPY --from=gcc /usr/lib/* /rootfs/usr/lib/
+COPY --from=gcc /usr/lib64/* /rootfs/usr/lib/
 
 FROM scratch as bootstrap-package
 USER 100:100
-COPY --from=bootstrap-build /home/user/rootfs/ /
+COPY --from=bootstrap-build /rootfs/ /
 ENTRYPOINT ["/usr/bin/rustc"]
 CMD ["--version"]
 
@@ -139,7 +140,7 @@ RUN set -eux; \
         --release-channel="stable" \
         --enable-local-rust \
         --local-rust-root="/usr" \
-        --sysconfdir="/home/user/rootfs/etc" \
+        --sysconfdir="/rootfs/etc" \
         --llvm-root="/usr/lib/llvm${LLVM_VERSION}" \
         --disable-docs \
         --tools="cargo" \
@@ -149,7 +150,7 @@ RUN set -eux; \
         --enable-vendor \
         --dist-compression-formats=gz \
         --python="python3" \
-        --set="install.prefix=/home/user/rootfs/usr" \
+        --set="install.prefix=/rootfs/usr" \
         --set="build.extended=true" \
         --set="rust.musl-root=/usr" \
         --set="rust.backtrace-on-ice=true" \
@@ -167,14 +168,18 @@ RUN set -eux; \
         --set="target.x86_64-unknown-linux-musl.ar=ar" \
         --set="target.x86_64-unknown-linux-musl.linker=cc"; \
     python3 x.py dist
+
+FROM build as install
+USER 0:0
 RUN python3 x.py install
-COPY --from=musl /lib/* /home/user/rootfs/lib/
-COPY --from=gcc /usr/lib/* /home/user/rootfs/usr/lib/
-COPY --from=gcc /usr/lib64/* /home/user/rootfs/usr/lib/
-COPY --from=llvm /usr/lib/* /home/user/rootfs/usr/lib/
+COPY --from=musl /lib/* /rootfs/lib/
+COPY --from=gcc /usr/lib/* /rootfs/usr/lib/
+COPY --from=gcc /usr/lib64/* /rootfs/usr/lib/
+COPY --from=llvm /usr/lib/* /rootfs/usr/lib/
+RUN find /rootfs -exec touch -hcd "@0" "{}" +
 
 FROM scratch as package
 USER 100:100
-COPY --from=build /home/user/rootfs/ /
+COPY --from=install /rootfs/ /
 ENTRYPOINT ["/usr/bin/rustc"]
 CMD ["--version"]

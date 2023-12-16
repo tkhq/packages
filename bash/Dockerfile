@@ -3,8 +3,9 @@ from ${REGISTRY}/binutils as binutils
 from ${REGISTRY}/gcc as gcc
 from ${REGISTRY}/musl as musl
 from ${REGISTRY}/make as make
+from ${REGISTRY}/busybox as busybox
 
-from ${REGISTRY}/busybox as base
+FROM busybox as base
 ENV SRC_SITE=https://ftp.gnu.org/gnu/bash
 ENV SRC_VERSION=5.2.21
 ENV SRC_HASH=c8e31bdc59b69aaffc5b36509905ba3e5cbb12747091d27b4b977f078560d5b8
@@ -23,6 +24,7 @@ COPY --from=binutils . /
 COPY --from=make . /
 COPY --from=musl . /
 RUN set -eux; \
+    mkdir -p /home/user/rootfs/lib; \
     ./configure \
         --build=x86_64-unknown-linux-musl \
         --host=x86_64-unknown-linux-musl \
@@ -35,11 +37,14 @@ RUN set -eux; \
         --without-curses \
         --without-bash-malloc; \
     make
-RUN make DESTDIR=/home/user/rootfs install
-RUN ls -Rlah /home/user/rootfs
-COPY --from=musl /usr/lib/libc.so /home/user/rootfs/lib/ld-musl-x86_64.so.1
+
+FROM build as install
+USER 0:0
+RUN make DESTDIR=/rootfs install
+COPY --from=musl /usr/lib/libc.so /rootfs/lib/ld-musl-x86_64.so.1
+RUN find /rootfs -exec touch -hcd "@0" "{}" +
 
 FROM scratch as package
-COPY --from=build /home/user/rootfs /
+COPY --from=install /rootfs /
 ENTRYPOINT ["/bin/bash"]
 CMD ["--version"]

@@ -1,13 +1,16 @@
 ARG REGISTRY=local
-FROM ${REGISTRY}/bootstrap as base
+FROM ${REGISTRY}/bootstrap as bootstrap
+
+FROM bootstrap as base
 ENV SRC_SITE=https://busybox.net/downloads
 ENV SRC_VERSION=1.35.0
 ENV SRC_HASH=faeeb244c35a348a334f4a59e44626ee870fb07b6884d68c10ae8bc19f83a694
 ENV SRC_FILE=busybox-${SRC_VERSION}.tar.bz2
+ENV KCONFIG_NOTIMESTAMP=1
 
 FROM base as fetch
 RUN set -eux; \
-    wget ${SRC_SITE}/${SRC_FILE}; \
+    wget ${SRC_SITE}/${SRC_FILE}
     echo "${SRC_HASH}  ${SRC_FILE}" | sha256sum -c
 
 FROM fetch as build
@@ -50,24 +53,30 @@ RUN set -eux; \
 	done; \
 	for confV in $setConfs; do \
 		grep -q "^$confV\$" .config; \
-	done
+	done; \
+    make
 
-RUN make
-RUN cp busybox /
+FROM build as install
+USER 0:0
+RUN set -eux; \
+    mkdir -p /rootfs/bin; \
+    cp busybox /rootfs/bin; \
+    cd /rootfs; \
+    mkdir -p home/user var/tmp etc tmp lib bin; \
+    /bin/busybox --install -s bin; \
+    echo "user:x:1000:" > etc/group; \
+    echo "user:x:1000:1000::/home/user:/bin/sh" > etc/passwd; \
+    ln -sT /lib lib64; \
+    chown -R 1000:1000 /rootfs/home/user /tmp /var/tmp; \
+    find . -exec touch -hcd "@0" "{}" +
 
 FROM scratch as package
-COPY --from=build busybox /
-RUN ["/busybox","mkdir","/bin"]
-RUN ["/busybox","--install","-s","/bin"]
-RUN echo "user:x:1000:" > /etc/group
-RUN echo "user:x:1000:1000::/home/user:/bin/sh" > /etc/passwd
-RUN mkdir -p /home/user /tmp /lib /var/tmp
-RUN ln -sT /lib /lib64
-RUN chown -R 1000:1000 /home/user /tmp /var/tmp
+COPY --from=install /rootfs /
 WORKDIR /home/user
 USER 1000:1000
 ENTRYPOINT ["/bin/sh"]
 ENV TZ=UTC
 ENV LANG=C.UTF-8
 ENV SOURCE_DATE_EPOCH=1
+ENV KCONFIG_NOTIMESTAMP=1
 ENV PS1="busybox$ "

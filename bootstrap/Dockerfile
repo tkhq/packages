@@ -4,5 +4,6 @@ FROM seed as fetch
 RUN set -ex; \
     apk update; \
     apk add gcc g++ libc-dev make linux-headers patch
+RUN find / -exec touch -hcd "@0" "{}" +
 
 FROM fetch as package

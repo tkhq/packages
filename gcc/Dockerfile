@@ -1,7 +1,9 @@
 ARG REGISTRY=local
 FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/binutils:latest as binutils
+FROM ${REGISTRY}/bootstrap:latest as bootstrap
 
-FROM ${REGISTRY}/bootstrap:latest as base
+FROM bootstrap as base
 ENV VERSION 12.2.0
 ENV SRC_FILE gcc-$VERSION.tar.xz
 ENV SRC_SITE https://mirrors.kernel.org/gnu/gcc/gcc-${VERSION}
@@ -55,23 +57,26 @@ RUN set -eux; \
 		--enable-languages=c,c++ \
 		--enable-link-serialization=2 \
 		--enable-linker-build-id; \
-	make -j "$(nproc)"; \
-    make DESTDIR=/home/user/rootfs/ install-strip; \
-    ln -s gcc /home/user/rootfs/usr/bin/cc
-COPY --from=musl /lib/* /home/user/rootfs/lib/
+	make -j "$(nproc)"
 
-FROM ${REGISTRY}/binutils:latest as binutils
-FROM scratch as test
-COPY --from=busybox . /
+FROM build as install
+USER 0:0
+RUN set -eux; \
+    make DESTDIR=/rootfs/ install-strip; \
+    ln -s gcc /rootfs/usr/bin/cc
+COPY --from=musl /lib/* /rootfs/lib/
+RUN find /rootfs -exec touch -hcd "@0" "{}" +
+
+FROM busybox as test
 COPY --from=binutils . /
 COPY --from=musl . /
-COPY --from=build /home/user/rootfs /
+COPY --from=install /rootfs /
 ADD test.c .
 RUN set -eux; \
     gcc test.c -static -o main; \
     ./main | grep "Success"
 
 FROM scratch as package
-COPY --from=build /home/user/rootfs /
+COPY --from=build /rootfs /
 ENTRYPOINT ["/usr/bin/gcc"]
 CMD ["--version"]
