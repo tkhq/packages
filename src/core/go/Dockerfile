@@ -11,7 +11,7 @@ ENV GOOS=linux
 ENV CGO_ENABLED=0
 ENV VERSION=1.21.4
 ENV SRC_SITE=https://storage.googleapis.com/golang
-ENV SRC_HASH=e25c9ab72d811142b7f41ff6da5165fec2d1be5feec3ef2c66bc0bdecb431489
+ENV SRC_HASH=47b26a83d2b65a3c1c1bcace273b69bee49a7a7b5168a7604ded3d26a37bd787
 ENV VERSION_BOOTSTRAP_2=1.19.11
 ENV SRC_SITE_BOOTSTRAP_2=https://storage.googleapis.com/golang
 ENV SRC_HASH_BOOTSTRAP_2=e25c9ab72d811142b7f41ff6da5165fec2d1be5feec3ef2c66bc0bdecb431489
@@ -22,8 +22,11 @@ COPY --from=gcc . /
 COPY --from=gcc . /
 COPY --from=bash . /
 COPY --from=musl . /
-RUN rm /bin/ar
 COPY --from=binutils . /
+# Hack to work around busybox ar breaking the build
+USER 0:0
+RUN rm /bin/ar
+USER 1000:1000
 
 FROM base as fetch
 RUN set -eux; \
@@ -55,8 +58,9 @@ ENV GOROOT_FINAL=/home/user/go-bootstrap-2
 ENV GOROOT=${GOROOT_FINAL}
 ENV DEST=${GOROOT_FINAL}
 ENV GOBIN=${GOROOT_FINAL}/bin
+WORKDIR /home/user
 RUN set -eux; \
-    tar -xzf go${VERSION_BOOTSTRAP_2}.tar.gz; \
+    tar -xzf go${VERSION_BOOTSTRAP_2}.src.tar.gz; \
     mv go go-bootstrap-2-src
 WORKDIR go-bootstrap-2-src
 RUN set -eux; \
@@ -73,6 +77,7 @@ ENV GOROOT_BOOTSTRAP=/home/user/go-bootstrap-2
 ENV GOROOT_FINAL="/lib/go"
 ENV GOBIN=${GOROOT_FINAL}/bin
 ENV GOROOT=/home/user/go-bootstrap-2
+WORKDIR /home/user
 RUN set -eux; \
     tar -xzf go${VERSION}.src.tar.gz; \
     mv go go-src
@@ -80,7 +85,7 @@ WORKDIR go-src
 RUN set -eux; \
     cd src; \
     bash make.bash; \
-    cd ..; \
+    cd ..
 
 FROM build as install
 USER 0:0
