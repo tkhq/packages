@@ -6,6 +6,7 @@ FROM ${REGISTRY}/curl:latest as curl
 FROM ${REGISTRY}/ninja:latest as ninja
 FROM ${REGISTRY}/openssl:latest as openssl
 FROM ${REGISTRY}/linux-headers:latest as linux-headers
+FROM ${REGISTRY}/openssl:latest as openssl
 FROM ${REGISTRY}/make:latest as make
 FROM ${REGISTRY}/busybox:latest as busybox
 
@@ -13,16 +14,16 @@ FROM busybox as base
 ENV SRC_SITE=https://cmake.org/files
 ENV SRC_VERSION=3.27.8
 ENV SRC_HASH=fece24563f697870fbb982ea8bf17482c9d5f855d8c9bf0b82463d76c9e8d0cc
-COPY --from=curl . /
 COPY --from=binutils . /
 COPY --from=ninja . /
 COPY --from=musl . /
 COPY --from=make . /
 COPY --from=linux-headers . /
 COPY --from=gcc . /
+COPY --from=openssl . /
 
 FROM base as fetch
-RUN curl -O ${SRC_SITE}/v3.27/cmake-${SRC_VERSION}.tar.gz
+RUN wget --no-check-certificate ${SRC_SITE}/v3.27/cmake-${SRC_VERSION}.tar.gz
 RUN echo "${SRC_HASH}  cmake-${SRC_VERSION}.tar.gz" | sha256sum -c
 
 FROM fetch as build

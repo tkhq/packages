@@ -1,10 +1,9 @@
 ARG REGISTRY=local
-FROM ${REGISTRY}/gcc:latest as gcc
 FROM ${REGISTRY}/binutils:latest as binutils
-FROM ${REGISTRY}/musl:latest as musl
 FROM ${REGISTRY}/make:latest as make
-FROM ${REGISTRY}/openssl:latest as openssl
 FROM ${REGISTRY}/python:latest as python
+FROM ${REGISTRY}/musl:latest as musl
+FROM ${REGISTRY}/gcc:latest as gcc
 FROM ${REGISTRY}/busybox:latest as busybox
 
 FROM busybox as base

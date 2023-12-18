@@ -17,6 +17,8 @@ COPY --from=musl . /
 FROM base as fetch
 RUN wget ${SRC_SITE}/pkgconf-${SRC_VERSION}.tar.xz
 RUN echo "${SRC_HASH}  pkgconf-${SRC_VERSION}.tar.xz" | sha256sum -c
+
+FROM fetch as build
 RUN tar -xf pkgconf-${SRC_VERSION}.tar.xz
 WORKDIR pkgconf-${SRC_VERSION}
 RUN set -eux; \

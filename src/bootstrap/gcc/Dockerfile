@@ -62,21 +62,21 @@ RUN set -eux; \
 FROM build as install
 USER 0:0
 RUN set -eux; \
-    make DESTDIR=/rootfs/ install-strip; \
+    make DESTDIR=/rootfs install-strip; \
     ln -s gcc /rootfs/usr/bin/cc
 COPY --from=musl /lib/* /rootfs/lib/
 RUN find /rootfs -exec touch -hcd "@0" "{}" +
 
 FROM busybox as test
+COPY --from=install /rootfs /
 COPY --from=binutils . /
 COPY --from=musl . /
-COPY --from=install /rootfs /
 ADD test.c .
 RUN set -eux; \
     gcc test.c -static -o main; \
     ./main | grep "Success"
 
 FROM scratch as package
-COPY --from=build /rootfs /
+COPY --from=install /rootfs /
 ENTRYPOINT ["/usr/bin/gcc"]
 CMD ["--version"]

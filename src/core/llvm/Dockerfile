@@ -8,7 +8,6 @@ FROM ${REGISTRY}/python as python
 FROM ${REGISTRY}/py-setuptools as py-setuptools
 FROM ${REGISTRY}/cmake as cmake
 FROM ${REGISTRY}/ninja as ninja
-FROM ${REGISTRY}/curl as curl
 FROM ${REGISTRY}/busybox as busybox
 
 FROM busybox as base
@@ -25,10 +24,9 @@ COPY --from=musl . /
 COPY --from=gcc . /
 COPY --from=python . /
 COPY --from=py-setuptools . /
-COPY --from=curl . /
 
 FROM base as fetch
-RUN curl -LOJ ${SRC_SITE}/llvmorg-${SRC_VERSION}/llvm-project-${SRC_VERSION}.src.tar.xz
+RUN wget ${SRC_SITE}/llvmorg-${SRC_VERSION}/llvm-project-${SRC_VERSION}.src.tar.xz
 RUN echo "$(printenv SRC_HASH_${VERSION//./_})  llvm-project-${SRC_VERSION}.src.tar.xz" | sha256sum -c
 
 FROM fetch as build

@@ -9,7 +9,6 @@ FROM ${REGISTRY}/bash as bash
 FROM ${REGISTRY}/make as make
 FROM ${REGISTRY}/cmake as cmake
 FROM ${REGISTRY}/perl as perl
-FROM ${REGISTRY}/curl as curl
 FROM ${REGISTRY}/libunwind as libunwind
 FROM ${REGISTRY}/python as python
 FROM ${REGISTRY}/py-setuptools as py-setuptools
@@ -68,15 +67,12 @@ COPY --from=perl . /
 COPY --from=gcc . /
 COPY --from=libunwind . /
 COPY --from=musl . /
-COPY --from=gcc . /
-COPY --from=musl . /
 
 FROM base as bootstrap-fetch
-COPY --from=curl . /
 RUN set -eux; \
-    curl ${MRUSTC_SITE}/${MRUSTC_VERSION} -o mrustc.tar.gz; \
+    wget --no-check-certificate ${MRUSTC_SITE}/${MRUSTC_VERSION} -O mrustc.tar.gz; \
     echo "${MRUSTC_HASH}  mrustc.tar.gz" | sha256sum -c; \
-    curl -OJ ${SRC_SITE}/rustc-${BOOTSTRAP_VERSION}-src.tar.gz; \
+    wget --no-check-certificate ${SRC_SITE}/rustc-${BOOTSTRAP_VERSION}-src.tar.gz; \
     echo "$(printenv SRC_HASH_${BOOTSTRAP_VERSION//./_})  rustc-${BOOTSTRAP_VERSION}-src.tar.gz" | sha256sum -c
 
 FROM bootstrap-fetch as bootstrap-build
@@ -120,9 +116,7 @@ ENTRYPOINT ["/usr/bin/rustc"]
 CMD ["--version"]
 
 FROM base as fetch
-COPY --from=curl . /
-RUN curl -OJ ${SRC_SITE}/rustc-${VERSION}-src.tar.gz
-RUN env
+RUN wget --no-check-certificate ${SRC_SITE}/rustc-${VERSION}-src.tar.gz
 RUN echo "$(printenv SRC_HASH_${VERSION//./_})  rustc-${VERSION}-src.tar.gz"
 RUN echo "$(printenv SRC_HASH_${VERSION//./_})  rustc-${VERSION}-src.tar.gz" | sha256sum -c
 

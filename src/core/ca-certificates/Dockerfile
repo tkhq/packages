@@ -1,3 +1,4 @@
+ARG REGISTRY=local
 FROM ${REGISTRY}/busybox:latest as base
 
 FROM base as install

@@ -10,7 +10,7 @@ ENV KCONFIG_NOTIMESTAMP=1
 
 FROM base as fetch
 RUN set -eux; \
-    wget ${SRC_SITE}/${SRC_FILE}
+    wget ${SRC_SITE}/${SRC_FILE}; \
     echo "${SRC_HASH}  ${SRC_FILE}" | sha256sum -c
 
 FROM fetch as build
@@ -61,13 +61,14 @@ USER 0:0
 RUN set -eux; \
     mkdir -p /rootfs/bin; \
     cp busybox /rootfs/bin; \
+    cp busybox /bin; \
     cd /rootfs; \
     mkdir -p home/user var/tmp etc tmp lib bin; \
     /bin/busybox --install -s bin; \
     echo "user:x:1000:" > etc/group; \
     echo "user:x:1000:1000::/home/user:/bin/sh" > etc/passwd; \
     ln -sT /lib lib64; \
-    chown -R 1000:1000 /rootfs/home/user /tmp /var/tmp; \
+    chown -R 1000:1000 /rootfs/home/user /rootfs/tmp /rootfs/var/tmp; \
     find . -exec touch -hcd "@0" "{}" +
 
 FROM scratch as package
