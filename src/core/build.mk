@@ -1,6 +1,7 @@
 .PHONY: core
 core: \
 	out/rust.tgz \
+	out/go.tgz \
 	out/python.tgz \
 	out/perl.tgz \
 	out/gcc.tgz \
