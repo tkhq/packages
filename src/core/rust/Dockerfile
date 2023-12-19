@@ -97,9 +97,13 @@ RUN make test local_tests
 RUN make -f minicargo.mk LLVM_CONFIG=/usr/bin/llvm-config output/rustc
 RUN make -f minicargo.mk LLVM_CONFIG=/usr/bin/llvm-config output/cargo
 RUN make -C run_rustc LLVM_CONFIG=/usr/bin/llvm-config
+
+FROM bootstrap-build as bootstrap-install
+USER 0:0
 RUN set -eux; \
     mkdir -p /rootfs/usr/bin /rootfs/usr/lib; \
     cp -R run_rustc/output/prefix/* /rootfs/; \
+    rm -rf /rootfs/tmp; \
     rm /rootfs/bin/rustc; \
     mv /rootfs/bin/rustc_binary /rootfs/usr/bin/rustc; \
     mv /rootfs/bin/cargo /rootfs/usr/bin/; \
@@ -108,10 +112,11 @@ RUN set -eux; \
 COPY --from=musl /lib/* /rootfs/lib/
 COPY --from=gcc /usr/lib/* /rootfs/usr/lib/
 COPY --from=gcc /usr/lib64/* /rootfs/usr/lib/
+RUN find /rootfs -exec touch -hcd "@0" "{}" +
 
 FROM scratch as bootstrap-package
 USER 100:100
-COPY --from=bootstrap-build /rootfs/ /
+COPY --from=bootstrap-install /rootfs/ /
 ENTRYPOINT ["/usr/bin/rustc"]
 CMD ["--version"]
 
