@@ -240,7 +240,7 @@ out/rust1.67.tgz: out/rust1.66.tgz
 out/rust1.68.tgz: out/rust1.67.tgz
 	$(call build,core,rust,1.68.0,package,--build-arg BUILD_VERSION=1.67.0)
 
-out/rust1.69.tgz: out/rust1.68.tgz llvm.tgz
+out/rust1.69.tgz: out/rust1.68.tgz out/llvm.tgz
 	$(call build,core,rust,1.69.0,package,--build-arg BUILD_VERSION=1.68.0 --build-arg LLVM_VERSION=16)
 
 out/rust1.70.tgz: out/rust1.69.tgz
