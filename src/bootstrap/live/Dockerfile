@@ -23,20 +23,20 @@ RUN ./download-distfiles.sh
 RUN set -eux; \
     mkdir -p /rootfs; \
     mv steps distfiles seed/* /rootfs/
-RUN cat <<EOF > /rootfs/steps/bootstrap.cfg
-FORCE_TIMESTAMPS=False
-CHROOT=False
-CHROOT_ONLY_SYSA=False
-UPDATE_CHECKSUMS=False
-JOBS=2
-INTERNAL_CI=None
-BARE_METAL=True
-DISK=sdb
-KERNEL_BOOTSTRAP=True
-BUILD_KERNELS=False
-EOF
+RUN echo "\
+FORCE_TIMESTAMPS=False\n\
+CHROOT=False\n\
+CHROOT_ONLY_SYSA=False\n\
+UPDATE_CHECKSUMS=False\n\
+JOBS=2\n\
+INTERNAL_CI=None\n\
+BARE_METAL=True\n\
+DISK=sdb\n\
+KERNEL_BOOTSTRAP=True\n\
+BUILD_KERNELS=False\
+" > /rootfs/steps/bootstrap.cfg
 
-FROM busybox as build
+FROM scratch as build
 COPY --from=stage0 / .
 COPY --from=fetch /rootfs .
 ENV ARCH_DIR=x86
