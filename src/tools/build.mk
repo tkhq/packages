@@ -7,3 +7,8 @@ out/curl.tgz: \
 	out/openssl.tgz \
 	out/ca-certificates.tgz
 	$(call build,tools,curl)
+
+out/tofu.tgz: \
+	out/busybox.tgz \
+	out/go.tgz
+	$(call build,tools,tofu)
