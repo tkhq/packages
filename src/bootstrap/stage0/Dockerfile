@@ -18,10 +18,10 @@ RUN set -eux; \
     echo "${SRC_HASH}  stage0-posix-${VERSION}.tar.gz" | sha256sum -c; \
     tar -xf stage0-posix-${VERSION}.tar.gz
 WORKDIR stage0-posix-${VERSION}
-RUN bootstrap-seeds/POSIX/AMD64/kaem-optional-seed
-RUN mv AMD64/bin /rootfs/
+RUN bootstrap-seeds/POSIX/x86/kaem-optional-seed
+RUN mkdir -p /rootfs && mv x86 M2libc /rootfs/
 WORKDIR /rootfs
-RUN sha256sum * > hashes.txt
+RUN sha256sum x86/bin/* > hashes.txt
 
 FROM archlinux as build2
 ARG VERSION
@@ -36,10 +36,10 @@ RUN set -eux; \
     echo "${SRC_HASH}  stage0-posix-${VERSION}.tar.gz" | sha256sum -c; \
     tar -xf stage0-posix-${VERSION}.tar.gz
 WORKDIR stage0-posix-${VERSION}
-RUN bootstrap-seeds/POSIX/AMD64/kaem-optional-seed
-RUN mv AMD64/bin /rootfs/
+RUN bootstrap-seeds/POSIX/x86/kaem-optional-seed
+RUN mkdir -p /rootfs && mv x86 M2libc /rootfs/
 WORKDIR /rootfs
-RUN sha256sum * > hashes.txt
+RUN sha256sum x86/bin/* > hashes.txt
 
 FROM alpine as build3
 ARG VERSION
@@ -54,10 +54,11 @@ RUN set -eux; \
     echo "${SRC_HASH}  stage0-posix-${VERSION}.tar.gz" | sha256sum -c; \
     tar -xf stage0-posix-${VERSION}.tar.gz
 WORKDIR stage0-posix-${VERSION}
-RUN bootstrap-seeds/POSIX/AMD64/kaem-optional-seed
-RUN mv AMD64/bin /rootfs/
+RUN bootstrap-seeds/POSIX/x86/kaem-optional-seed
+RUN mkdir -p /rootfs && mv x86 M2libc /rootfs/
 WORKDIR /rootfs
-RUN sha256sum * > hashes.txt
+RUN sha256sum x86/bin/* > hashes.txt
+RUN cat hashes.txt
 
 FROM scratch as compare
 COPY --from=build1 /rootfs/ /a

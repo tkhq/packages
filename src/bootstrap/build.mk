@@ -9,5 +9,5 @@ out/bootstrap.tgz:
 out/stage0.tgz:
 	$(call build,bootstrap,stage0)
 
-out/mes.tgz: out/stage0.tgz
-	$(call build,bootstrap,mes)
+out/live.tgz: out/stage0.tgz
+	$(call build,bootstrap,live)
